@@ -1,0 +1,10 @@
+# .prettierignore
+dist/
+build/
+coverage/
+*.min.js
+package-lock.json
+pnpm-lock.yaml
+
+# 자동 생성된 파일
+*.generated.ts
