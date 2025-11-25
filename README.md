@@ -16,8 +16,8 @@
 2. **비행선 터미널**: B0은 여러 이세계 도시로 가는 비행선이 출발하는 숨겨진 정류장
 3. **가상 세계 여행**: 6개의 테마가 다른 도시를 비행선을 타고 여행
 4. **게스트하우스**: 각 도시의 게스트하우스에서 다른 여행자들을 만나 이야기 나누기
-    - **혼합형**: 정해진 시간에 함께하는 이벤트 중심 (불멍, 별멍 등)
-    - **조용한 방**: 개인적인 대화와 자기성찰 중심 (No 파티)
+   - **혼합형**: 정해진 시간에 함께하는 이벤트 중심 (불멍, 별멍 등)
+   - **조용한 방**: 개인적인 대화와 자기성찰 중심 (No 파티)
 5. **라운지**: 같은 게스트하우스 사람들과 1:1 대화를 나눌 수 있는 공간
 6. **자기성찰**: 개인 숙소에서 일기를 쓰고, 질문에 답하며 자신을 돌아보기
 7. **AI 호스트**: 친절한 호스트가 대화를 이끌고 이벤트를 진행
@@ -169,9 +169,9 @@ const [state, setState] = useState(0);
 `@`를 사용하여 src 디렉토리를 참조할 수 있습니다:
 
 ```typescript
-import {cn} from '@/lib/utils';
-import {Button} from '@/components/ui/button';
-import type {User} from '@/types/user';
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import type { User } from "@/types/user";
 ```
 
 ### Shadcn UI 컴포넌트 추가

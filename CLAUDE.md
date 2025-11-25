@@ -78,8 +78,8 @@ src/
 `@`를 사용하여 `src` 디렉토리를 참조:
 
 ```typescript
-import {cn} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 ```
 
 ## UI 컴포넌트
@@ -143,8 +143,8 @@ npx shadcn@latest add button card dialog
 1. **B0 (지하 0층)**: 비행선 터미널 - 여러 이세계 도시로 가는 출발점
 2. **6개 도시**: 세렌시아(관계), 로렌시아(회복), 에테리아(사랑), 드리모스(꿈), 셀레니아(성찰), 아벤투라(모험)
 3. **게스트하우스**:
-    - **혼합형**: AI 호스트가 이벤트 진행 (불멍, 별멍 등), 최대 6명/룸
-    - **조용한 방**: 개인 대화와 자기성찰 중심
+   - **혼합형**: AI 호스트가 이벤트 진행 (불멍, 별멍 등), 최대 6명/룸
+   - **조용한 방**: 개인 대화와 자기성찰 중심
 4. **라운지**: 1:1 대화 공간
 5. **개인 숙소**: 일기 작성(50P), 문답지 작성(50P)
 
