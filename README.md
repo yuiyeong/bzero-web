@@ -14,10 +14,10 @@
 
 1. **지하 0층 발견**: 어느 날 방에서 발견한 신비한 핸드폰에 설치된 앱, B0 - 존재하지 않는 층으로의 초대
 2. **비행선 터미널**: B0은 여러 이세계 도시로 가는 비행선이 출발하는 숨겨진 정류장
-3. **가상 세계 여행**: 6개의 테마가 다른 도시를 비행선을 타고 여행
+3. **가상 세계 여행**: 5개의 테마가 다른 도시를 비행선을 타고 여행
 4. **게스트하우스**: 각 도시의 게스트하우스에서 다른 여행자들을 만나 이야기 나누기
-    - **혼합형**: 정해진 시간에 함께하는 이벤트 중심 (불멍, 별멍 등)
-    - **조용한 방**: 개인적인 대화와 자기성찰 중심 (No 파티)
+   - **혼합형**: 정해진 시간에 함께하는 이벤트 중심 (불멍, 별멍 등)
+   - **조용한 방**: 개인적인 대화와 자기성찰 중심 (No 파티)
 5. **라운지**: 같은 게스트하우스 사람들과 1:1 대화를 나눌 수 있는 공간
 6. **자기성찰**: 개인 숙소에서 일기를 쓰고, 질문에 답하며 자신을 돌아보기
 7. **AI 호스트**: 친절한 호스트가 대화를 이끌고 이벤트를 진행
@@ -109,11 +109,15 @@ bzero-web/
 ├── src/
 │   ├── assets/         # 이미지, 폰트 등 리소스
 │   ├── components/     # React 컴포넌트
+│   │   ├── layout/    # 레이아웃 컴포넌트
 │   │   └── ui/        # Shadcn UI 컴포넌트
 │   ├── lib/           # 유틸리티 함수
-│   ├── App.tsx        # 루트 컴포넌트
+│   │   ├── utils.ts   # cn() 등 유틸리티
+│   │   └── query-client.ts  # TanStack Query 클라이언트
+│   ├── pages/         # 페이지 컴포넌트
+│   ├── root-route.tsx # React Router 라우트 정의
 │   ├── main.tsx       # 애플리케이션 진입점
-│   └── index.css      # 글로벌 스타일 (Tailwind)
+│   └── index.css      # 글로벌 스타일 (Tailwind + B0 테마)
 ├── components.json     # Shadcn UI 설정
 ├── eslint.config.js    # ESLint 설정
 ├── prettier.config.js  # Prettier 설정
@@ -169,9 +173,9 @@ const [state, setState] = useState(0);
 `@`를 사용하여 src 디렉토리를 참조할 수 있습니다:
 
 ```typescript
-import {cn} from '@/lib/utils';
-import {Button} from '@/components/ui/button';
-import type {User} from '@/types/user';
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import type { User } from "@/types/user";
 ```
 
 ### Shadcn UI 컴포넌트 추가
@@ -181,14 +185,44 @@ npx shadcn@latest add button
 npx shadcn@latest add card
 ```
 
-## 향후 계획
+## 테마 시스템
 
-- [ ] 라우팅 구조 설계 및 구현
-- [ ] 전역 상태 관리 패턴 정립
-- [ ] API 통신 레이어 구축
-- [ ] 인증/권한 시스템 구현
-- [ ] 6개 테마 도시 디자인 및 개발
-- [ ] 게스트하우스 채팅 시스템
-- [ ] AI 호스트 통합
-- [ ] 자기성찰 일기 기능
-- [ ] 반응형 디자인 최적화
+B0 프로젝트는 다크 모드 기반의 커스텀 테마를 사용합니다.
+
+### 브랜드 색상
+
+| 색상 | HEX | 용도 |
+|------|-----|------|
+| B0 Purple | `#9333EA` | 메인 브랜드 색상 |
+| Light Purple | `#C084FC` | 보조 강조 색상 |
+| Deep Navy | `#0F0F23` | 배경 색상 |
+| Card Navy | `#1A1B3C` | 카드 배경 색상 |
+
+### 도시별 테마 색상
+
+| 도시 | 테마 | 색상 |
+|------|------|------|
+| 세렌시아 | 관계 | `#F97316` (노을빛 오렌지) |
+| 로렌시아 | 회복 | `#22C55E` (숲 초록) |
+| 엠마시아 | 희망 | `#84CC16` (밝은 라임) |
+| 다마린 | 고요 | `#64748B` (안개 슬레이트) |
+| 갈리시아 | 성찰 | `#F59E0B` (황금빛 앰버) |
+
+### 커스텀 유틸리티 클래스
+
+```css
+.glass            /* 글래스모피즘 효과 */
+.gradient-sunset  /* 노을 그라데이션 */
+.gradient-bg      /* 배경 그라데이션 */
+.gradient-overlay /* 이미지 오버레이 */
+```
+
+## 라우트
+
+| 경로 | 페이지 | 설명 |
+|------|--------|------|
+| `/` | IndexPage | 홈 페이지 |
+| `/onboarding` | OnboardingPage | 온보딩 페이지 |
+| `/sign-in` | SignInPage | 로그인 페이지 |
+| `/sign-up` | SignUpPage | 회원가입 페이지 |
+| `/profile` | ProfilePage | 프로필 페이지 |
