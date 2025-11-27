@@ -10,7 +10,7 @@ import { router } from "@/root-route.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools />
+      {import.meta.env.DEV ? <ReactQueryDevtools /> : null}
       <RouterProvider router={router} />
     </QueryClientProvider>
   </StrictMode>
