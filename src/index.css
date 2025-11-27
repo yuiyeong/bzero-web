@@ -39,77 +39,121 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* B0 커스텀 색상 */
+  --color-b0-purple: var(--b0-purple);
+  --color-b0-light-purple: var(--b0-light-purple);
+  --color-b0-pink-purple: var(--b0-pink-purple);
+  --color-b0-deep-navy: var(--b0-deep-navy);
+  --color-b0-card-navy: var(--b0-card-navy);
+
+  /* 도시 테마 색상 */
+  --color-city-serensia: var(--city-serensia);
+  --color-city-lorensia: var(--city-lorensia);
+  --color-city-emmasia: var(--city-emmasia);
+  --color-city-damarin: var(--city-damarin);
+  --color-city-galicia: var(--city-galicia);
 }
 
 :root {
   --radius: 0.75rem;
-  /* 라이트 모드 - B0 브랜드 퍼플 기반 반전 색상 */
-  --background: oklch(0.976 0.008 293);
-  --foreground: oklch(0.167 0.033 285.885);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.167 0.033 285.885);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.167 0.033 285.885);
-  --primary: oklch(0.541 0.281 293.009);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.946 0.028 293);
-  --secondary-foreground: oklch(0.541 0.281 293.009);
-  --muted: oklch(0.946 0.028 293);
-  --muted-foreground: oklch(0.551 0.018 264.364);
-  --accent: oklch(0.714 0.203 292.788);
-  --accent-foreground: oklch(0.167 0.033 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.541 0.281 293.009 / 20%);
-  --input: oklch(0.541 0.281 293.009 / 10%);
-  --ring: oklch(0.541 0.281 293.009);
-  --chart-1: oklch(0.541 0.281 293.009);
-  --chart-2: oklch(0.714 0.203 292.788);
-  --chart-3: oklch(0.824 0.154 316.334);
-  --chart-4: oklch(0.646 0.222 41.116);
-  --chart-5: oklch(0.6 0.118 184.704);
-  --sidebar: oklch(0.976 0.008 293);
-  --sidebar-foreground: oklch(0.167 0.033 285.885);
-  --sidebar-primary: oklch(0.541 0.281 293.009);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.946 0.028 293);
-  --sidebar-accent-foreground: oklch(0.541 0.281 293.009);
-  --sidebar-border: oklch(0.541 0.281 293.009 / 20%);
-  --sidebar-ring: oklch(0.541 0.281 293.009);
+
+  /* ===========================================
+     B0 브랜드 색상
+     reference: .claude/skills/brand-guide/reference.md
+     =========================================== */
+
+  /* 브랜드 주요 색상 */
+  --b0-purple: oklch(0.541 0.281 293.009); /* #9333EA */
+  --b0-light-purple: oklch(0.714 0.203 292.788); /* #C084FC */
+  --b0-pink-purple: oklch(0.824 0.154 316.334); /* #F0ABFC */
+  --b0-deep-navy: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --b0-card-navy: oklch(0.216 0.054 282.365); /* #1A1B3C */
+
+  /* 도시별 테마 색상 */
+  --city-serensia: oklch(0.702 0.191 41.116); /* #F97316 - 관계, 노을빛 오렌지 */
+  --city-lorensia: oklch(0.723 0.219 142.498); /* #22C55E - 회복, 숲 초록 */
+  --city-emmasia: oklch(0.768 0.213 130.851); /* #84CC16 - 희망, 밝은 라임 */
+  --city-damarin: oklch(0.554 0.046 257.417); /* #64748B - 고요, 안개 슬레이트 */
+  --city-galicia: oklch(0.746 0.174 66.484); /* #F59E0B - 성찰, 황금빛 앰버 */
+
+  /* 글래스모피즘 */
+  --glass-bg: oklch(0.216 0.054 282.365 / 70%); /* #1A1B3C 70% */
+  --glass-border: oklch(1 0 0 / 10%); /* #FFFFFF 10% */
+  --glass-blur: 12px;
+
+  /* ===========================================
+     라이트 모드 (관리자/특수 용도)
+     =========================================== */
+  --background: oklch(0.98 0.008 293); /* #F8F7FC */
+  --foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --card: oklch(1 0 0); /* #FFFFFF */
+  --card-foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --popover: oklch(1 0 0); /* #FFFFFF */
+  --popover-foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --primary: oklch(0.541 0.281 293.009); /* #9333EA */
+  --primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  --secondary: oklch(0.946 0.028 293); /* #F3E8FF */
+  --secondary-foreground: oklch(0.541 0.281 293.009); /* #9333EA */
+  --muted: oklch(0.946 0.028 293); /* #F3E8FF */
+  --muted-foreground: oklch(0.551 0.018 264.364); /* #6B7280 */
+  --accent: oklch(0.714 0.203 292.788); /* #C084FC */
+  --accent-foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --destructive: oklch(0.637 0.237 25.331); /* #EF4444 */
+  --border: oklch(0.541 0.281 293.009 / 20%); /* #9333EA 20% */
+  --input: oklch(0.541 0.281 293.009 / 10%); /* #9333EA 10% */
+  --ring: oklch(0.541 0.281 293.009); /* #9333EA */
+  --chart-1: oklch(0.541 0.281 293.009); /* #9333EA */
+  --chart-2: oklch(0.714 0.203 292.788); /* #C084FC */
+  --chart-3: oklch(0.824 0.154 316.334); /* #F0ABFC */
+  --chart-4: oklch(0.702 0.191 41.116); /* #F97316 */
+  --chart-5: oklch(0.723 0.219 142.498); /* #22C55E */
+  --sidebar: oklch(0.98 0.008 293); /* #F8F7FC */
+  --sidebar-foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --sidebar-primary: oklch(0.541 0.281 293.009); /* #9333EA */
+  --sidebar-primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(0.946 0.028 293); /* #F3E8FF */
+  --sidebar-accent-foreground: oklch(0.541 0.281 293.009); /* #9333EA */
+  --sidebar-border: oklch(0.541 0.281 293.009 / 20%); /* #9333EA 20% */
+  --sidebar-ring: oklch(0.541 0.281 293.009); /* #9333EA */
 }
 
 .dark {
-  /* 다크 모드 - B0 브랜드 가이드 기본 테마 */
-  --background: oklch(0.167 0.033 285.885);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.216 0.054 282.365);
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.216 0.054 282.365);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.541 0.281 293.009);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.216 0.054 282.365);
-  --secondary-foreground: oklch(0.714 0.203 292.788);
-  --muted: oklch(0.216 0.054 282.365);
-  --muted-foreground: oklch(0.871 0.006 264.529);
-  --accent: oklch(0.714 0.203 292.788);
-  --accent-foreground: oklch(0.167 0.033 285.885);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 20%);
-  --ring: oklch(0.541 0.281 293.009);
-  --chart-1: oklch(0.541 0.281 293.009);
-  --chart-2: oklch(0.714 0.203 292.788);
-  --chart-3: oklch(0.824 0.154 316.334);
-  --chart-4: oklch(0.646 0.222 41.116);
-  --chart-5: oklch(0.6 0.118 184.704);
-  --sidebar: oklch(0.216 0.054 282.365);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.541 0.281 293.009);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.216 0.054 282.365);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.541 0.281 293.009);
+  /* ===========================================
+     다크 모드 - B0 기본 테마
+     브랜드 가이드 기준 (reference.md)
+     =========================================== */
+  --background: oklch(0.167 0.033 285.885); /* #0F0F23 - Deep Navy */
+  --foreground: oklch(1 0 0); /* #FFFFFF - White */
+  --card: oklch(0.216 0.054 282.365); /* #1A1B3C - Card Navy */
+  --card-foreground: oklch(1 0 0); /* #FFFFFF */
+  --popover: oklch(0.216 0.054 282.365); /* #1A1B3C */
+  --popover-foreground: oklch(1 0 0); /* #FFFFFF */
+  --primary: oklch(0.541 0.281 293.009); /* #9333EA - Brand Purple */
+  --primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  --secondary: oklch(0.216 0.054 282.365); /* #1A1B3C */
+  --secondary-foreground: oklch(0.714 0.203 292.788); /* #C084FC - Light Purple */
+  --muted: oklch(0.216 0.054 282.365); /* #1A1B3C */
+  --muted-foreground: oklch(0.871 0.006 264.529); /* #D1D5DB - Gray 300 */
+  --accent: oklch(0.714 0.203 292.788); /* #C084FC - Light Purple */
+  --accent-foreground: oklch(0.167 0.033 285.885); /* #0F0F23 */
+  --destructive: oklch(0.637 0.237 25.331); /* #EF4444 - Error Red */
+  --border: oklch(1 0 0 / 10%); /* #FFFFFF 10% */
+  --input: oklch(1 0 0 / 20%); /* #FFFFFF 20% */
+  --ring: oklch(0.541 0.281 293.009); /* #9333EA */
+  --chart-1: oklch(0.541 0.281 293.009); /* #9333EA */
+  --chart-2: oklch(0.714 0.203 292.788); /* #C084FC */
+  --chart-3: oklch(0.824 0.154 316.334); /* #F0ABFC */
+  --chart-4: oklch(0.702 0.191 41.116); /* #F97316 */
+  --chart-5: oklch(0.723 0.219 142.498); /* #22C55E */
+  --sidebar: oklch(0.216 0.054 282.365); /* #1A1B3C */
+  --sidebar-foreground: oklch(1 0 0); /* #FFFFFF */
+  --sidebar-primary: oklch(0.541 0.281 293.009); /* #9333EA */
+  --sidebar-primary-foreground: oklch(1 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(0.216 0.054 282.365); /* #1A1B3C */
+  --sidebar-accent-foreground: oklch(1 0 0); /* #FFFFFF */
+  --sidebar-border: oklch(1 0 0 / 10%); /* #FFFFFF 10% */
+  --sidebar-ring: oklch(0.541 0.281 293.009); /* #9333EA */
 }
 
 @layer base {
@@ -119,5 +163,41 @@
   body {
     @apply bg-background text-foreground;
     font-family: "Pretendard Variable", "Noto Sans KR", sans-serif;
+  }
+}
+
+/* ===========================================
+   B0 커스텀 유틸리티 클래스
+   =========================================== */
+@layer utilities {
+  /* 글래스모피즘 */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+
+  /* 노을 그라데이션 (히어로 섹션용) */
+  .gradient-sunset {
+    background: linear-gradient(
+      135deg,
+      oklch(0.541 0.281 293.009) 0%,
+      /* #9333EA */ oklch(0.702 0.191 41.116) 50%,
+      /* #F97316 */ oklch(0.746 0.174 66.484) 100% /* #F59E0B */
+    );
+  }
+
+  /* 배경 그라데이션 */
+  .gradient-bg {
+    background: linear-gradient(
+      180deg,
+      oklch(0.216 0.054 282.365) 0%,
+      /* #1A1B3C */ oklch(0.167 0.033 285.885) 100% /* #0F0F23 */
+    );
+  }
+
+  /* 이미지 오버레이 그라데이션 */
+  .gradient-overlay {
+    background: linear-gradient(180deg, transparent 0%, oklch(0.167 0.033 285.885 / 90%) 100% /* #0F0F23 90% */);
   }
 }
