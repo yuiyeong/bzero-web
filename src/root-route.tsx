@@ -2,14 +2,19 @@ import { createBrowserRouter, Navigate } from "react-router";
 import OnboardingPage from "@/pages/onboarding-page.tsx";
 import SignInPage from "@/pages/sign-in-page.tsx";
 import SignUpPage from "@/pages/sign-up-page.tsx";
-import ProfilePage from "@/pages/profile-page.tsx";
+import ProfileCompletionPage from "@/pages/profile-completion-page.tsx";
 import IndexPage from "@/pages/index-page.tsx";
 import MainLayout from "@/components/layout/main-layout.tsx";
 import OnboardingGuard from "@/components/guards/onboarding-guard.tsx";
+import GuestGuard from "@/components/guards/guest-guard.tsx";
+import AuthGuard from "@/components/guards/auth-guard.tsx";
+import AuthPage from "@/pages/auth-page.tsx";
+import EmailVerificationPage from "@/pages/email-verification-page.tsx";
+import { ROUTES } from "@/lib/routes.ts";
 
 export const router = createBrowserRouter([
   {
-    path: "/onboarding",
+    path: ROUTES.ONBOARDING,
     element: <OnboardingPage />,
   },
   {
@@ -19,28 +24,48 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           {
-            path: "/sign-in",
-            element: <SignInPage />,
-            handle: { title: "로그인" },
+            element: <GuestGuard />,
+            children: [
+              {
+                path: ROUTES.AUTH,
+                element: <AuthPage />,
+                handle: { title: "시작하기", isRoot: true },
+              },
+              {
+                path: ROUTES.SIGN_IN,
+                element: <SignInPage />,
+                handle: { title: "로그인", isRoot: false },
+              },
+              {
+                path: ROUTES.SIGN_UP,
+                element: <SignUpPage />,
+                handle: { title: "회원가입", isRoot: false },
+              },
+              {
+                path: ROUTES.EMAIL_VERIFICATION,
+                element: <EmailVerificationPage />,
+                handle: { title: "이메일 확인", isRoot: true },
+              },
+            ],
           },
           {
-            path: "/sign-up",
-            element: <SignUpPage />,
-            handle: { title: "회원가입" },
-          },
-          {
-            path: "/profile",
-            element: <ProfilePage />,
-            handle: { title: "프로필" },
-          },
-          {
-            path: "/",
-            element: <IndexPage />,
-            handle: { title: "홈" },
-          },
-          {
-            path: "*",
-            element: <Navigate to="/" />,
+            element: <AuthGuard />,
+            children: [
+              {
+                path: ROUTES.HOME,
+                element: <IndexPage />,
+                handle: { title: "홈", isRoot: true },
+              },
+              {
+                path: ROUTES.PROFILE_COMPLETION,
+                element: <ProfileCompletionPage />,
+                handle: { title: "프로필 설정", isRoot: false },
+              },
+              {
+                path: "*",
+                element: <Navigate to={ROUTES.HOME} />,
+              },
+            ],
           },
         ],
       },
