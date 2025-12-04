@@ -69,7 +69,7 @@ export const router = createBrowserRouter([
                 handle: { title: "B0 터미널", isRoot: true },
               },
               {
-                path: "/terminal/booking/:cityId",
+                path: ROUTES.TICKET_BOOKING,
                 element: <TicketBookingPage />,
                 handle: { title: "비행선 예매", isRoot: false },
               },
