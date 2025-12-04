@@ -1,4 +1,4 @@
-# B0 (비제로) - 지하 0층 🎈
+# B0 (비제로) - 지하 0층
 
 > 숨겨진 지하 0층에서 출발하는 비행선을 타고 가상 세계를 여행하며 힐링과 자기성찰을 경험하는 온라인 커뮤니티
 
@@ -10,7 +10,7 @@
 
 ## 주요 기능
 
-### 🎭 핵심 컨셉
+### 핵심 컨셉
 
 1. **지하 0층 발견**: 어느 날 방에서 발견한 신비한 핸드폰에 설치된 앱, B0 - 존재하지 않는 층으로의 초대
 2. **비행선 터미널**: B0은 여러 이세계 도시로 가는 비행선이 출발하는 숨겨진 정류장
@@ -26,26 +26,30 @@
 
 ### 코어
 
-- **React** 19.1.1 - UI 라이브러리
-- **TypeScript** 5.9.3 - 타입 안정성
-- **Vite** 7.1.7 - 빌드 도구 및 개발 서버
+- **React** 19 - UI 라이브러리
+- **TypeScript** - 타입 안정성
+- **Vite** - 빌드 도구 및 개발 서버
 
 ### 상태 관리
 
-- **Zustand** 5.0.8 - 경량 클라이언트 상태 관리
-- **TanStack Query** 5.90.6 - 서버 상태 관리 및 데이터 페칭
+- **Zustand** - 경량 클라이언트 상태 관리
+- **TanStack Query** - 서버 상태 관리 및 데이터 페칭
 
 ### 라우팅
 
-- **React Router** 7.9.5 - 클라이언트 사이드 라우팅
+- **React Router** 7+ - 클라이언트 사이드 라우팅
+
+### 인증 & API
+
+- **Supabase Auth** - 사용자 인증 (이메일/비밀번호)
+- **Axios** - HTTP 클라이언트
 
 ### 스타일링 & UI
 
-- **Tailwind CSS** 4.1.16 - 유틸리티 우선 CSS 프레임워크
+- **Tailwind CSS** 4 - 유틸리티 우선 CSS 프레임워크
 - **Shadcn UI** - 접근성을 고려한 재사용 가능한 컴포넌트 (New York 스타일)
 - **Radix UI** - 헤드리스 UI 컴포넌트 프리미티브
 - **Lucide React** - 아이콘 라이브러리
-- **class-variance-authority** - 타입 안전한 컴포넌트 변형 관리
 
 ### 코드 품질
 
@@ -69,6 +73,18 @@ cd bzero-web
 
 # 의존성 설치
 pnpm install
+```
+
+### 환경 변수 설정
+
+```bash
+# .env 파일 생성
+cp .env.example .env
+
+# 필요한 환경 변수 설정
+# VITE_API_BASE_URL=<백엔드 API URL>
+# VITE_SUPABASE_URL=<Supabase URL>
+# VITE_SUPABASE_ANON_KEY=<Supabase Anon Key>
 ```
 
 ### 개발 서버 실행
@@ -105,24 +121,45 @@ pnpm format
 
 ```
 bzero-web/
-├── public/              # 정적 파일
+├── public/                # 정적 파일
 ├── src/
-│   ├── assets/         # 이미지, 폰트 등 리소스
-│   ├── components/     # React 컴포넌트
-│   │   ├── layout/    # 레이아웃 컴포넌트
-│   │   └── ui/        # Shadcn UI 컴포넌트
-│   ├── lib/           # 유틸리티 함수
-│   │   ├── utils.ts   # cn() 등 유틸리티
-│   │   └── query-client.ts  # TanStack Query 클라이언트
-│   ├── pages/         # 페이지 컴포넌트
-│   ├── root-route.tsx # React Router 라우트 정의
-│   ├── main.tsx       # 애플리케이션 진입점
-│   └── index.css      # 글로벌 스타일 (Tailwind + B0 테마)
-├── components.json     # Shadcn UI 설정
-├── eslint.config.js    # ESLint 설정
-├── prettier.config.js  # Prettier 설정
-├── tsconfig.json       # TypeScript 설정
-└── vite.config.ts      # Vite 설정
+│   ├── api/              # 백엔드 API 함수 (도메인별 분리)
+│   │   ├── auth.ts       # Supabase 인증 API
+│   │   └── users.ts      # 사용자 관련 API
+│   ├── assets/           # 이미지, 폰트 등 리소스
+│   │   └── images/       # 이미지 파일
+│   ├── components/       # React 컴포넌트
+│   │   ├── guards/       # 라우트 가드 (AuthGuard, GuestGuard 등)
+│   │   ├── layout/       # 레이아웃 컴포넌트
+│   │   ├── onboarding/   # 온보딩 관련 컴포넌트
+│   │   └── ui/           # Shadcn UI 컴포넌트
+│   ├── hooks/            # 커스텀 훅
+│   │   ├── mutations/    # TanStack Query mutation 훅
+│   │   └── queries/      # TanStack Query query 훅
+│   ├── lib/              # 유틸리티 함수 및 설정
+│   │   ├── api-client.ts # Axios 인스턴스
+│   │   ├── api-errors.ts # API 에러 처리
+│   │   ├── errors.ts     # 인증 에러 메시지 매핑
+│   │   ├── query-client.ts # TanStack Query 설정
+│   │   ├── routes.ts     # 라우트 경로 상수
+│   │   ├── supabase.ts   # Supabase 클라이언트
+│   │   └── utils.ts      # cn() 등 유틸리티
+│   ├── pages/            # 페이지 컴포넌트
+│   ├── providers/        # 컨텍스트 프로바이더
+│   │   └── auth-session-provider.tsx
+│   ├── stores/           # Zustand 스토어
+│   │   ├── auth-store.ts
+│   │   └── onboarding-store.ts
+│   ├── types.ts          # 공통 타입 정의
+│   ├── App.tsx           # 앱 루트 컴포넌트
+│   ├── root-route.tsx    # React Router 라우트 정의
+│   ├── main.tsx          # 애플리케이션 진입점
+│   └── index.css         # 글로벌 스타일 (Tailwind + B0 테마)
+├── components.json        # Shadcn UI 설정
+├── eslint.config.js       # ESLint 설정
+├── prettier.config.js     # Prettier 설정
+├── tsconfig.json          # TypeScript 설정
+└── vite.config.ts         # Vite 설정
 ```
 
 ## 개발 가이드
@@ -142,29 +179,28 @@ bzero-web/
 #### TypeScript
 
 ```typescript
-// ✅ Good: Type import 사용
-import type {User} from './types';
+// Good: Type import 사용
+import type { User } from "./types";
 
-// ✅ Good: 사용하지 않는 변수는 _ 접두사
-const handleClick = (_event: MouseEvent) => { ...
-};
+// Good: 사용하지 않는 변수는 _ 접두사
+const handleClick = (_event: MouseEvent) => { ... };
 
-// ❌ Bad: any 타입 사용 (경고)
+// Bad: any 타입 사용 (경고)
 const data: any = fetchData();
 ```
 
 #### React
 
 ```typescript
-// ✅ Good: Self-closing 태그
-<Component / >
+// Good: Self-closing 태그
+<Component />
 
-// ✅ Good: React import 불필요 (React 19)
+// Good: React import 불필요 (React 19)
 function MyComponent() {
-    return <div>Hello < /div>;
+  return <div>Hello</div>;
 }
 
-// ✅ Good: Hooks 규칙 준수
+// Good: Hooks 규칙 준수
 const [state, setState] = useState(0);
 ```
 
@@ -175,7 +211,7 @@ const [state, setState] = useState(0);
 ```typescript
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import type { User } from "@/types/user";
+import type { User } from "@/types";
 ```
 
 ### Shadcn UI 컴포넌트 추가
@@ -191,22 +227,22 @@ B0 프로젝트는 다크 모드 기반의 커스텀 테마를 사용합니다.
 
 ### 브랜드 색상
 
-| 색상 | HEX | 용도 |
-|------|-----|------|
-| B0 Purple | `#9333EA` | 메인 브랜드 색상 |
-| Light Purple | `#C084FC` | 보조 강조 색상 |
-| Deep Navy | `#0F0F23` | 배경 색상 |
-| Card Navy | `#1A1B3C` | 카드 배경 색상 |
+| 색상         | HEX       | 용도             |
+| ------------ | --------- | ---------------- |
+| B0 Purple    | `#9333EA` | 메인 브랜드 색상 |
+| Light Purple | `#C084FC` | 보조 강조 색상   |
+| Deep Navy    | `#0F0F23` | 배경 색상        |
+| Card Navy    | `#1A1B3C` | 카드 배경 색상   |
 
 ### 도시별 테마 색상
 
-| 도시 | 테마 | 색상 |
-|------|------|------|
+| 도시     | 테마 | 색상                      |
+| -------- | ---- | ------------------------- |
 | 세렌시아 | 관계 | `#F97316` (노을빛 오렌지) |
-| 로렌시아 | 회복 | `#22C55E` (숲 초록) |
-| 엠마시아 | 희망 | `#84CC16` (밝은 라임) |
-| 다마린 | 고요 | `#64748B` (안개 슬레이트) |
-| 갈리시아 | 성찰 | `#F59E0B` (황금빛 앰버) |
+| 로렌시아 | 회복 | `#22C55E` (숲 초록)       |
+| 엠마시아 | 희망 | `#84CC16` (밝은 라임)     |
+| 다마린   | 고요 | `#64748B` (안개 슬레이트) |
+| 갈리시아 | 성찰 | `#F59E0B` (황금빛 앰버)   |
 
 ### 커스텀 유틸리티 클래스
 
@@ -219,10 +255,16 @@ B0 프로젝트는 다크 모드 기반의 커스텀 테마를 사용합니다.
 
 ## 라우트
 
-| 경로 | 페이지 | 설명 |
-|------|--------|------|
-| `/` | IndexPage | 홈 페이지 |
-| `/onboarding` | OnboardingPage | 온보딩 페이지 |
-| `/sign-in` | SignInPage | 로그인 페이지 |
-| `/sign-up` | SignUpPage | 회원가입 페이지 |
-| `/profile` | ProfilePage | 프로필 페이지 |
+| 경로                       | 페이지                | 가드       | 설명                             |
+| -------------------------- | --------------------- | ---------- | -------------------------------- |
+| `/onboarding`              | OnboardingPage        | -          | 온보딩 페이지                    |
+| `/auth`                    | AuthPage              | GuestGuard | 인증 시작 (로그인/회원가입 선택) |
+| `/auth/sign-in`            | SignInPage            | GuestGuard | 로그인                           |
+| `/auth/sign-up`            | SignUpPage            | GuestGuard | 회원가입                         |
+| `/auth/email-verification` | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
+| `/`                        | IndexPage             | AuthGuard  | 홈 (메인)                        |
+| `/profile-completion`      | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
+
+## 상세 문서
+
+더 자세한 개발 가이드와 아키텍처 패턴은 `CLAUDE.md` 파일을 참고하세요.
