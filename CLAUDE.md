@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **B0 (비제로) 웹 애플리케이션**은 지하 0층에서 출발하는 비행선을 타고 가상 세계를 여행하며 힐링과 자기성찰을 경험하는 온라인 커뮤니티의 메인 웹앱입니다.
 
 - **기술 스택**: React 19 + TypeScript + Vite + React Router + Zustand + TanStack Query + Tailwind CSS 4 + Shadcn UI
+- **인증**: Supabase Auth
 - **패키지 매니저**: pnpm
 - **Node.js**: 18.0.0 이상 필요
 
@@ -60,26 +61,121 @@ pnpm format
 - **Self-closing 태그**: 자식이 없는 컴포넌트는 `<Component />` 형식
 - **Hooks 규칙**: 항상 컴포넌트 최상위에서 호출
 
+### Import 순서
+
+import 문은 다음 순서로 그룹화 (빈 줄로 구분하지 않음):
+
+1. UI 컴포넌트 (`@/components/ui/`)
+2. 커스텀 컴포넌트 (`@/components/`)
+3. React 및 외부 라이브러리 (`react`, `react-router`, `sonner` 등)
+4. 커스텀 훅 (`@/hooks/`)
+5. 유틸리티/타입 (`@/lib/`, `@/types.ts`)
+6. 스토어 (`@/stores/`)
+7. 에셋 (`@/assets/`)
+
+```typescript
+// 좋은 예
+import { Label } from "@/components/ui/label.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { EmojiPicker } from "@/components/emoji-picker.tsx";
+import { type ChangeEvent, type FormEvent, useState } from "react";
+import { useUpdateMe } from "@/hooks/mutations/use-update-me.ts";
+import type { B0ApiError } from "@/lib/api-errors.ts";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
+import { ROUTES } from "@/lib/routes.ts";
+```
+
+### 컴포넌트 내부 구조 순서
+
+컴포넌트 내부 코드는 다음 순서로 작성:
+
+1. **상태 선언** (`useState`)
+2. **라우터 훅** (`useNavigate`, `useLocation` 등)
+3. **커스텀 훅** (mutation, query 훅 등)
+4. **useEffect**
+5. **유효성 검사 함수** (`validate...`)
+6. **이벤트 핸들러** (`handle...`)
+7. **return (JSX)**
+
+```typescript
+export default function ProfileCompletionPage() {
+  // 1. 상태 선언
+  const [nickname, setNickname] = useState("");
+  const [selectedEmoji, setSelectedEmoji] = useState("🌟");
+
+  // 2. 라우터 훅
+  const navigate = useNavigate();
+
+  // 3. 커스텀 훅
+  const { mutate: updateMe, isPending } = useUpdateMe({
+    onSuccess: () => navigate(ROUTES.HOME, { replace: true }),
+    onError: (error: B0ApiError) => toast.error(error.message),
+  });
+
+  // 4. useEffect (필요한 경우)
+
+  // 5. 유효성 검사 함수
+  const validateNickname = (value: string): string | null => {
+    // ...
+  };
+
+  // 6. 이벤트 핸들러
+  const handleNicknameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNickname(e.target.value);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    // ...
+  };
+
+  // 7. return (JSX)
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* ... */}
+    </form>
+  );
+}
+```
+
 ## 프로젝트 구조
 
 ```
 src/
+├── api/              # 백엔드 API 함수 (도메인별 분리)
+│   ├── auth.ts       # Supabase 인증 API 함수
+│   └── users.ts      # 사용자 관련 API 함수
 ├── assets/           # 이미지, 폰트 등 정적 리소스
+│   └── images/       # 이미지 파일
 ├── components/       # React 컴포넌트
-│   ├── layout/      # 레이아웃 컴포넌트 (MainLayout 등)
-│   └── ui/          # Shadcn UI 컴포넌트 (자동 생성)
-├── lib/             # 유틸리티 함수
-│   ├── utils.ts     # cn() 등 유틸리티
-│   └── query-client.ts  # TanStack Query 클라이언트
-├── pages/           # 페이지 컴포넌트
-│   ├── index-page.tsx       # 홈 페이지
-│   ├── onboarding-page.tsx  # 온보딩 페이지
-│   ├── sign-in-page.tsx     # 로그인 페이지
-│   ├── sign-up-page.tsx     # 회원가입 페이지
-│   └── profile-page.tsx     # 프로필 페이지
-├── root-route.tsx   # React Router 라우트 정의
-├── main.tsx         # 애플리케이션 진입점
-└── index.css        # 글로벌 스타일 (Tailwind + B0 테마)
+│   ├── guards/       # 라우트 가드 컴포넌트 (AuthGuard, GuestGuard 등)
+│   ├── layout/       # 레이아웃 컴포넌트 (MainLayout 등)
+│   ├── onboarding/   # 온보딩 관련 컴포넌트
+│   └── ui/           # Shadcn UI 컴포넌트 (자동 생성)
+├── hooks/            # 커스텀 훅
+│   ├── mutations/    # TanStack Query mutation 훅
+│   └── queries/      # TanStack Query query 훅
+├── lib/              # 유틸리티 함수 및 설정
+│   ├── api-client.ts # Axios 인스턴스 (인터셉터 포함)
+│   ├── api-errors.ts # 에러 처리 유틸리티
+│   ├── errors.ts     # Supabase 인증 에러 메시지 매핑
+│   ├── query-client.ts # TanStack Query 클라이언트 및 queryKeys
+│   ├── routes.ts     # 라우트 경로 상수
+│   ├── supabase.ts   # Supabase 클라이언트
+│   └── utils.ts      # cn() 등 유틸리티
+├── pages/            # 페이지 컴포넌트
+├── providers/        # 컨텍스트 프로바이더
+│   └── auth-session-provider.tsx  # Supabase 인증 세션 관리
+├── stores/           # Zustand 스토어
+│   ├── auth-store.ts      # 인증 상태 관리
+│   └── onboarding-store.ts # 온보딩 상태 관리
+├── types.ts          # 공통 타입 정의
+├── App.tsx           # 앱 루트 컴포넌트
+├── root-route.tsx    # React Router 라우트 정의
+├── main.tsx          # 애플리케이션 진입점
+└── index.css         # 글로벌 스타일 (Tailwind + B0 테마)
 ```
 
 ### Path Alias
@@ -91,6 +187,310 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 ```
 
+## 아키텍처 패턴
+
+### API 레이어 패턴
+
+API 호출은 `src/api/` 디렉토리에 도메인별로 분리하여 관리:
+
+```typescript
+// src/api/users.ts
+import type { DataResponse, User } from "@/types.ts";
+import apiClient from "@/lib/api-client.ts";
+
+/**
+ * 현재 로그인한 사용자 정보 조회
+ *
+ * @throws {B0ApiError} NOT_FOUND_USER - 백엔드에 사용자가 존재하지 않는 경우
+ */
+export async function getMe(): Promise<User> {
+  const { data } = await apiClient.get<DataResponse<User>>("/users/me");
+  return data.data;
+}
+```
+
+**규칙:**
+
+- 함수 상단에 JSDoc 주석 작성 (설명, @throws 등)
+- `apiClient` 인스턴스 사용 (자동으로 인증 토큰 첨부)
+- 응답에서 `data.data`를 추출하여 반환
+- Supabase 인증 API는 `src/api/auth.ts`에서 별도 관리
+
+### TanStack Query 훅 패턴
+
+#### Query 훅 (`src/hooks/queries/`)
+
+```typescript
+// src/hooks/queries/use-me.ts
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { getMe } from "@/api/users.ts";
+import { queryKeys } from "@/lib/query-client.ts";
+import type { B0ApiError } from "@/lib/api-errors.ts";
+import type { User } from "@/types.ts";
+
+/**
+ * 현재 로그인한 사용자 정보를 조회하는 쿼리 훅
+ *
+ * - retry: false로 설정하여 NOT_FOUND_USER 에러 시 재시도하지 않음
+ * - AuthGuard에서 사용자 존재 여부 확인에 활용
+ */
+export function useMe(): UseQueryResult<User, B0ApiError> {
+  return useQuery({
+    queryKey: queryKeys.me.detail,
+    queryFn: getMe,
+    retry: false,
+  });
+}
+```
+
+**규칙:**
+
+- 파일명: `use-{도메인}.ts` (예: `use-me.ts`)
+- 함수명: `use{도메인}` (예: `useMe`)
+- JSDoc 주석으로 훅의 용도와 특이사항 설명
+- `queryKeys` 객체에서 쿼리 키 관리
+
+#### Mutation 훅 (`src/hooks/mutations/`)
+
+```typescript
+// src/hooks/mutations/use-update-me.ts
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateMe } from "@/api/users.ts";
+import type { UseMutationCallback, User } from "@/types.ts";
+import { queryKeys } from "@/lib/query-client.ts";
+import type { B0ApiError } from "@/lib/api-errors.ts";
+
+/**
+ * 사용자 정보 업데이트 mutation 훅
+ *
+ * 프로필 완성 페이지에서 닉네임, 이모지 설정 시 사용
+ * 성공 시 캐시된 사용자 정보를 자동으로 업데이트
+ */
+export function useUpdateMe(callback?: UseMutationCallback<User, B0ApiError>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateMe,
+    onSuccess: (data: User) => {
+      // 캐시된 사용자 정보 업데이트 (refetch 없이 즉시 반영)
+      queryClient.setQueryData(queryKeys.me.detail, () => data);
+      callback?.onSuccess?.(data);
+    },
+    onError: (error: B0ApiError) => {
+      console.error(error);
+      callback?.onError?.(error);
+    },
+  });
+}
+```
+
+**규칙:**
+
+- 파일명: `use-{동작}-{도메인}.ts` (예: `use-update-me.ts`, `use-sign-up.ts`)
+- 함수명: `use{동작}{도메인}` (예: `useUpdateMe`, `useSignUp`)
+- 콜백 타입: `UseMutationCallback<TData, TError>` 사용
+- 성공 시 관련 쿼리 캐시 업데이트
+- 에러는 `console.error`로 로깅 후 콜백 호출
+
+### Zustand 스토어 패턴
+
+```typescript
+// src/stores/auth-store.ts
+import { create } from "zustand";
+import { combine, devtools } from "zustand/middleware";
+import { type Session } from "@supabase/supabase-js";
+
+/**
+ * 인증 상태 인터페이스
+ */
+interface AuthState {
+  /** Supabase 세션 로드 완료 여부 */
+  isLoaded: boolean;
+  /** Supabase 인증 세션 (null이면 비로그인 상태) */
+  session: Session | null;
+}
+
+interface AuthActions {
+  actions: {
+    setSession: (session: Session | null) => void;
+  };
+}
+
+const initialState: AuthState = {
+  isLoaded: false,
+  session: null,
+};
+
+export const useAuthStore = create(
+  devtools(
+    combine(initialState, (set) => {
+      const authActions: AuthActions = {
+        actions: {
+          setSession: (session: Session | null): void => {
+            set({ isLoaded: true, session });
+          },
+        },
+      };
+      return authActions;
+    }),
+    {
+      name: "authStore",
+      enabled: import.meta.env.DEV,
+    }
+  )
+);
+
+// 개별 셀렉터 훅 (상태 분리로 불필요한 리렌더링 방지)
+export const useAuthSession = () => useAuthStore((store) => store.session);
+export const useAuthIsLoaded = () => useAuthStore((store) => store.isLoaded);
+export const useSetAuthSession = () => useAuthStore((store) => store.actions.setSession);
+```
+
+**규칙:**
+
+- 파일명: `{도메인}-store.ts` (예: `auth-store.ts`)
+- 스토어 이름: `use{도메인}Store` (예: `useAuthStore`)
+- `State`와 `Actions` 인터페이스 분리 정의
+- `combine` 미들웨어로 상태와 액션 결합
+- `devtools` 미들웨어 사용 (개발 환경에서만 활성화)
+- 영속성 필요 시 `persist` 미들웨어 추가
+- 복잡한 상태 업데이트 시 `immer` 미들웨어 사용
+- **개별 셀렉터 훅 제공**: 상태별로 분리된 훅을 export하여 불필요한 리렌더링 방지
+
+### 라우트 가드 패턴
+
+라우트 보호를 위한 가드 컴포넌트 (`src/components/guards/`):
+
+```typescript
+// src/components/guards/auth-guard.tsx
+/**
+ * 인증된 사용자만 접근할 수 있는 라우트를 보호하는 가드 컴포넌트
+ *
+ * 처리 흐름:
+ * 1. Supabase 세션이 없으면 → 로그인 페이지로 리다이렉트
+ * 2. 세션은 있지만 백엔드 User가 없으면 → 자동으로 User 생성 (최초 로그인 시)
+ * 3. 프로필이 미완성이면 → 프로필 완성 페이지로 리다이렉트
+ * 4. 모든 조건 통과 시 → 자식 라우트 렌더링
+ */
+export default function AuthGuard() {
+  // ... 구현
+  return <Outlet />;
+}
+```
+
+**가드 종류:**
+
+- `AuthGuard`: 인증된 사용자만 접근 가능
+- `GuestGuard`: 비인증 사용자(게스트)만 접근 가능
+- `OnboardingGuard`: 온보딩 완료된 사용자만 접근 가능
+
+**규칙:**
+
+- 파일명: `{역할}-guard.tsx` (예: `auth-guard.tsx`)
+- JSDoc으로 처리 흐름 문서화
+- `Navigate`로 리다이렉트, `Outlet`으로 자식 라우트 렌더링
+- 로딩 중에는 `GlobalLoader` 표시
+
+### 프로바이더 패턴
+
+앱 전역 상태/기능 제공 (`src/providers/`):
+
+```typescript
+// src/providers/auth-session-provider.tsx
+/**
+ * Supabase 인증 세션을 관리하는 Provider 컴포넌트
+ *
+ * 앱 최상단에서 Supabase 인증 상태 변화를 구독하고,
+ * 세션 정보를 Zustand 스토어에 동기화함
+ */
+export default function AuthSessionProvider({ children }: { children: ReactNode }) {
+  // ... 구현
+  return children;
+}
+```
+
+**규칙:**
+
+- 파일명: `{기능}-provider.tsx`
+- JSDoc으로 역할 설명
+- 초기 로드 완료 전까지 `GlobalLoader` 표시
+
+### 에러 처리 패턴
+
+#### 백엔드 API 에러 (`src/lib/api-errors.ts`)
+
+```typescript
+// 에러 코드 상수 (백엔드와 동일하게 유지)
+export const ErrorCode = {
+  NOT_FOUND_USER: "NOT_FOUND_USER",
+  // ...
+} as const;
+
+// 커스텀 에러 클래스
+export class B0ApiError extends Error {
+  code: string;
+  statusCode: number;
+  // ...
+}
+
+// Axios 에러를 B0ApiError로 변환
+export function parseApiError(error: unknown): B0ApiError { ... }
+```
+
+#### Supabase 인증 에러 (`src/lib/errors.ts`)
+
+```typescript
+// 에러 코드 → 한국어 메시지 매핑
+const AUTH_ERROR_MESSAGE_MAP: Record<string, string> = {
+  email_exists: "이미 사용 중인 이메일입니다.",
+  // ...
+};
+
+export function generateAuthErrorMessage(error: Error): string { ... }
+```
+
+### 페이지 컴포넌트 패턴
+
+```typescript
+// src/pages/sign-in-page.tsx
+export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const { mutate: signInWithPassword, isPending } = useSignInWithPassword({
+    onSuccess: () => navigate(ROUTES.HOME, { replace: true }),
+    onError: (e: AuthError) => {
+      if (e.code === "email_not_confirmed") {
+        navigate(ROUTES.EMAIL_VERIFICATION, { replace: true });
+      } else {
+        toast.error(generateAuthErrorMessage(e));
+      }
+    },
+  });
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    // 유효성 검사
+    if (errorMessage) {
+      toast.error(errorMessage);
+      return;
+    }
+    signInWithPassword({ email, password });
+  };
+
+  return (
+    <form className="flex h-full flex-col py-8" onSubmit={handleSubmit}>
+      {/* ... */}
+    </form>
+  );
+}
+```
+
+**규칙:**
+
+- mutation 훅에서 `onSuccess`/`onError` 콜백으로 네비게이션 및 에러 처리
+- 폼 제출 전 클라이언트 유효성 검사
+- 에러 메시지는 `toast.error()`로 표시
+- `isPending` 상태로 입력 필드 및 버튼 비활성화
+
 ## UI 컴포넌트
 
 ### Shadcn UI
@@ -98,58 +498,132 @@ import { Button } from "@/components/ui/button";
 - **스타일**: New York
 - **Base Color**: Neutral
 - **아이콘**: Lucide React
-- **추가된 컴포넌트**: alert-dialog, button, dialog, input, sonner, textarea
+- **추가된 컴포넌트**: alert-dialog, button, carousel, dialog, input, label, sonner, textarea
 
 ### 컴포넌트 추가 방법
 
 ```bash
-# 버튼 컴포넌트 추가
-npx shadcn@latest add button
-
-# 카드 컴포넌트 추가
-npx shadcn@latest add card
-
-# 여러 컴포넌트 한 번에 추가
 npx shadcn@latest add button card dialog
 ```
 
 추가된 컴포넌트는 `src/components/ui/` 디렉토리에 자동 생성됩니다.
 
+### 커스텀 컴포넌트 패턴
+
+```typescript
+// src/components/emoji-picker.tsx
+interface EmojiPickerProps {
+  value: string;
+  onChange: (emoji: string) => void;
+  disabled?: boolean;
+}
+
+export function EmojiPicker({ value, onChange, disabled }: EmojiPickerProps) {
+  return (
+    <div className="...">
+      {PROFILE_EMOJIS.map((emoji) => (
+        <Button
+          key={emoji}
+          type="button"
+          variant="ghost"
+          onClick={() => onChange(emoji)}
+          disabled={disabled}
+          className={cn("...", value === emoji && "...")}
+        >
+          {emoji}
+        </Button>
+      ))}
+    </div>
+  );
+}
+```
+
+**규칙:**
+
+- Props 인터페이스 정의
+- `cn()` 유틸리티로 조건부 클래스 적용
+- `disabled` prop 지원
+
 ## 라우팅
 
 - **React Router**: `react-router` 사용 (v7+)
 - 라우트 정의: `src/root-route.tsx`
-- 레이아웃: `MainLayout`으로 공통 헤더/푸터 관리
-- 라우트별 타이틀: `handle.title`로 정의
+- 라우트 경로 상수: `src/lib/routes.ts`
+- 레이아웃: `MainLayout`으로 공통 헤더 관리
+- 라우트 핸들: `title`과 `isRoot` 속성 정의
 
-### 현재 라우트
+### 라우트 경로 상수
 
-| 경로 | 페이지 | 레이아웃 |
-|------|--------|----------|
-| `/` | IndexPage (홈) | MainLayout |
-| `/onboarding` | OnboardingPage | 없음 |
-| `/sign-in` | SignInPage | MainLayout |
-| `/sign-up` | SignUpPage | MainLayout |
-| `/profile` | ProfilePage | MainLayout |
+```typescript
+// src/lib/routes.ts
+export const ROUTES = {
+  HOME: "/",
+  ONBOARDING: "/onboarding",
+  AUTH: "/auth",
+  SIGN_IN: "/auth/sign-in",
+  SIGN_UP: "/auth/sign-up",
+  EMAIL_VERIFICATION: "/auth/email-verification",
+  PROFILE_COMPLETION: "/profile-completion",
+} as const;
+```
 
-## 상태 관리 패턴
+**규칙:**
 
-### 클라이언트 상태
+- 모든 라우트 경로는 `ROUTES` 상수에서 관리
+- 새 라우트 추가 시 `ROUTES`에 먼저 정의
 
-- **Zustand**: 경량 전역 상태 관리 라이브러리
-- 사용자 정보, UI 상태 등 클라이언트 상태 관리에 사용
+### 현재 라우트 구조
 
-### 서버 상태
+| 경로                       | 페이지                | 가드       | 설명                             |
+| -------------------------- | --------------------- | ---------- | -------------------------------- |
+| `/onboarding`              | OnboardingPage        | 없음       | 온보딩 페이지                    |
+| `/auth`                    | AuthPage              | GuestGuard | 인증 시작 (로그인/회원가입 선택) |
+| `/auth/sign-in`            | SignInPage            | GuestGuard | 로그인                           |
+| `/auth/sign-up`            | SignUpPage            | GuestGuard | 회원가입                         |
+| `/auth/email-verification` | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
+| `/`                        | IndexPage             | AuthGuard  | 홈 (메인)                        |
+| `/profile-completion`      | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
 
-- **TanStack Query**: 서버 데이터 페칭, 캐싱, 동기화
-- API 호출, 데이터 페칭 및 캐시 관리에 사용
-- **DevTools**: 개발 환경에서 활성화
+### 라우트 핸들
+
+```typescript
+{
+  path: ROUTES.SIGN_IN,
+  element: <SignInPage />,
+  handle: { title: "로그인", isRoot: false },
+}
+```
+
+- `title`: 헤더에 표시될 페이지 제목
+- `isRoot`: `true`이면 뒤로가기 버튼 숨김
+
+## 타입 정의 패턴
+
+공통 타입은 `src/types.ts`에서 관리:
+
+```typescript
+// TanStack Query mutation 콜백 타입
+export type UseMutationCallback<TData = unknown, TError = Error> = {
+  onSuccess?: (data: TData) => void;
+  onError?: (error: TError) => void;
+};
+
+// 백엔드 API 응답 래퍼 타입
+export interface DataResponse<T> {
+  data: T;
+}
+
+// 도메인 타입 (백엔드 모델과 동일)
+export interface User {
+  user_id: string;
+  email: string | null;
+  // ...
+}
+```
 
 ## 테마 시스템
 
 ### B0 브랜드 색상 (index.css)
-
-B0 프로젝트의 커스텀 색상 변수들이 정의되어 있습니다:
 
 ```css
 /* 브랜드 주요 색상 */
@@ -184,6 +658,133 @@ B0 프로젝트의 커스텀 색상 변수들이 정의되어 있습니다:
 ## 작업시 반드시 먼저 해야할 일
 
 - 코드를 생성하거나 수정할 때는 기존 코드와 비슷한 형태로 작성할 것
+- 새로운 API 함수 추가 시 JSDoc 주석 작성
+- 새로운 훅 추가 시 적절한 디렉토리에 파일 생성 (`queries/` 또는 `mutations/`)
+- 새로운 라우트 추가 시 `ROUTES` 상수에 먼저 정의
+
+## 안티 패턴 (하지 말아야 할 것)
+
+### API 호출
+
+```typescript
+// ❌ 잘못된 예: 컴포넌트에서 직접 API 호출
+export default function MyPage() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetch("/api/data").then((res) => setData(res));
+  }, []);
+}
+
+// ✅ 올바른 예: hooks/queries 디렉토리의 훅 사용
+export default function MyPage() {
+  const { data } = useMyData();
+}
+```
+
+### 라우트 경로
+
+```typescript
+// ❌ 잘못된 예: 하드코딩된 경로
+navigate("/auth/sign-in");
+<Link to="/profile-completion">
+
+// ✅ 올바른 예: ROUTES 상수 사용
+navigate(ROUTES.SIGN_IN);
+<Link to={ROUTES.PROFILE_COMPLETION}>
+```
+
+### 에러 처리
+
+```typescript
+// ❌ 잘못된 예: alert 사용
+if (error) {
+  alert(error.message);
+}
+
+// ✅ 올바른 예: toast 사용
+if (error) {
+  toast.error(error.message);
+}
+```
+
+### 상태 관리
+
+```typescript
+// ❌ 잘못된 예: 전체 스토어 구독 (불필요한 리렌더링 발생)
+const store = useAuthStore();
+const session = store.session;
+
+// ✅ 올바른 예: 셀렉터 훅 사용
+const session = useAuthSession();
+```
+
+### Props 인터페이스
+
+```typescript
+// ❌ 잘못된 예: 인라인 타입 또는 Props 이름 미사용
+function MyComponent({ value, onChange }: { value: string; onChange: () => void }) {}
+
+// ✅ 올바른 예: Props 인터페이스 별도 정의
+interface MyComponentProps {
+  value: string;
+  onChange: () => void;
+}
+
+function MyComponent({ value, onChange }: MyComponentProps) {}
+```
+
+### 컴포넌트 Export
+
+```typescript
+// ❌ 잘못된 예: named export (페이지/가드/프로바이더)
+export function SignInPage() {}
+
+// ✅ 올바른 예: default export (페이지/가드/프로바이더)
+export default function SignInPage() {}
+
+// 예외: UI 컴포넌트나 유틸리티 컴포넌트는 named export 가능
+export function EmojiPicker() {}
+```
+
+### 조건부 스타일
+
+```typescript
+// ❌ 잘못된 예: 삼항 연산자로 전체 클래스 교체
+className={isActive ? "bg-primary text-white p-4" : "bg-gray-100 text-black p-4"}
+
+// ✅ 올바른 예: cn() 유틸리티로 조건부 클래스 추가
+className={cn("p-4", isActive ? "bg-primary text-white" : "bg-gray-100 text-black")}
+// 또는
+className={cn("p-4 bg-gray-100", isActive && "bg-primary text-white")}
+```
+
+### 상수 정의
+
+```typescript
+// ❌ 잘못된 예: 컴포넌트 내부에 상수 정의
+export default function OnboardingPage() {
+  const SLIDE_COUNT = 3;
+  // ...
+}
+
+// ✅ 올바른 예: 컴포넌트 외부에 상수 정의
+const SLIDE_COUNT = 3;
+
+export default function OnboardingPage() {
+  // ...
+}
+```
+
+## 커밋 전 필수 작업
+
+**커밋하기 전에 반드시 다음 명령어를 순서대로 실행:**
+
+```bash
+pnpm format    # 코드 포매팅
+pnpm lint:fix  # 린트 오류 자동 수정
+```
+
+린트 오류가 모두 해결된 후에만 커밋을 진행합니다.
 
 ## 커밋 메시지 규칙
 
@@ -201,7 +802,7 @@ B0 프로젝트의 커스텀 색상 변수들이 정의되어 있습니다:
 
 커밋 제목은 구나 절의 형태로 작성하기.
 
-### 핵심 개념
+## 핵심 개념
 
 1. **B0 (지하 0층)**: 비행선 터미널 - 여러 이세계 도시로 가는 출발점
 2. **5개 도시**: 세렌시아(관계), 로렌시아(회복), 엠마시아(희망), 다마린(고요), 갈리시아(성찰)
@@ -222,8 +823,72 @@ B0 프로젝트의 커스텀 색상 변수들이 정의되어 있습니다:
 
 기능 구현 시 반드시 해당 문서를 참고하여 프로젝트 컨셉과 요구사항에 맞게 개발해야 합니다.
 
-## 페이지 네이밍 컨벤션
+## 네이밍 컨벤션
 
-- 페이지 컴포넌트 파일명: `kebab-case` + `-page.tsx` (예: `sign-in-page.tsx`)
-- 페이지 컴포넌트 이름: `PascalCase` + `Page` (예: `SignInPage`)
-- 라우트 핸들에 `title` 속성으로 페이지 제목 설정
+### 페이지
+
+- 파일명: `kebab-case` + `-page.tsx` (예: `sign-in-page.tsx`)
+- 컴포넌트명: `PascalCase` + `Page` (예: `SignInPage`)
+
+### 컴포넌트
+
+- 파일명: `kebab-case.tsx` (예: `emoji-picker.tsx`, `global-loader.tsx`)
+- 컴포넌트명: `PascalCase` (예: `EmojiPicker`, `GlobalLoader`)
+
+### 훅
+
+- Query 훅: `use-{도메인}.ts` → `use{도메인}()` (예: `use-me.ts` → `useMe()`)
+- Mutation 훅: `use-{동작}-{도메인}.ts` → `use{동작}{도메인}()` (예: `use-update-me.ts` → `useUpdateMe()`)
+
+### 스토어
+
+- 파일명: `{도메인}-store.ts` (예: `auth-store.ts`)
+- 스토어 훅: `use{도메인}Store` (예: `useAuthStore`)
+- 셀렉터 훅: `use{도메인}{상태}` (예: `useAuthSession`, `useAuthIsLoaded`)
+
+### API 함수
+
+- 파일명: `{도메인}.ts` (예: `users.ts`, `auth.ts`)
+- 함수명: `{동작}{대상}` (예: `getMe`, `updateMe`, `signUp`)
+
+### 가드 컴포넌트
+
+- 파일명: `{역할}-guard.tsx` (예: `auth-guard.tsx`)
+- 컴포넌트명: `{역할}Guard` (예: `AuthGuard`)
+
+### 프로바이더 컴포넌트
+
+- 파일명: `{기능}-provider.tsx` (예: `auth-session-provider.tsx`)
+- 컴포넌트명: `{기능}Provider` (예: `AuthSessionProvider`)
+
+### 이벤트 핸들러
+
+- 네이밍: `handle{대상}{동작}` (예: `handleEmailChange`, `handleSubmit`, `handleStartClicked`)
+- Props로 전달되는 콜백: `on{대상}{동작}` (예: `onStartClicked`, `onChange`)
+
+```typescript
+// 컴포넌트 내부 핸들러
+const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => { ... };
+const handleSubmit = (e: FormEvent) => { ... };
+const handleStartClicked = () => { ... };
+
+// Props로 받는 콜백
+interface Props {
+  onStartClicked?: () => void;
+  onChange: (value: string) => void;
+}
+```
+
+### 유효성 검사 함수
+
+- 네이밍: `validate{대상}` (예: `validateNickname`, `validateEmail`)
+- 반환: 에러 메시지 문자열 또는 `null` (유효한 경우)
+
+```typescript
+const validateNickname = (value: string): string | null => {
+  const trimmed = value.trim();
+  if (trimmed === "") return "닉네임을 입력해주세요.";
+  if (trimmed.length < 2 || trimmed.length > 10) return "닉네임은 2~10자로 입력해주세요.";
+  return null;
+};
+```
