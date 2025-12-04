@@ -18,4 +18,8 @@ export const ROUTES = {
   EMAIL_VERIFICATION: "/auth/email-verification",
   /** 프로필 완성 페이지 (닉네임, 이모지 설정) */
   PROFILE_COMPLETION: "/profile-completion",
+  /** B0 비행선 터미널 홈 */
+  TERMINAL: "/terminal",
+  /** 비행선 티켓 예매 */
+  TICKET_BOOKING: "/terminal/booking/:cityId",
 } as const;

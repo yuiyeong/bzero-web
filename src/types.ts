@@ -26,6 +26,19 @@ export interface ErrorResponse {
   error: ApiError;
 }
 
+/** 백엔드 API 페이지네이션 정보 */
+export interface Pagination {
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+/** 백엔드 API 리스트 응답 래퍼 타입 */
+export interface ListResponse<T> {
+  list: T[];
+  pagination: Pagination;
+}
+
 // ============================================================================
 // 인증 관련 타입
 // ============================================================================
@@ -58,4 +71,21 @@ export interface User {
 export interface UpdateUserRequestBody {
   nickname: string;
   profile_emoji: string;
+}
+
+// ============================================================================
+// 도시 관련 타입
+// ============================================================================
+
+/** 도시 정보 (백엔드 City 모델과 동일) */
+export interface City {
+  city_id: string;
+  name: string;
+  theme: string;
+  description: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }

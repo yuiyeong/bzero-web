@@ -4,6 +4,8 @@ import SignInPage from "@/pages/sign-in-page.tsx";
 import SignUpPage from "@/pages/sign-up-page.tsx";
 import ProfileCompletionPage from "@/pages/profile-completion-page.tsx";
 import IndexPage from "@/pages/index-page.tsx";
+import TerminalPage from "@/pages/terminal-page.tsx";
+import TicketBookingPage from "@/pages/ticket-booking-page.tsx";
 import MainLayout from "@/components/layout/main-layout.tsx";
 import OnboardingGuard from "@/components/guards/onboarding-guard.tsx";
 import GuestGuard from "@/components/guards/guest-guard.tsx";
@@ -60,6 +62,16 @@ export const router = createBrowserRouter([
                 path: ROUTES.PROFILE_COMPLETION,
                 element: <ProfileCompletionPage />,
                 handle: { title: "프로필 설정", isRoot: false },
+              },
+              {
+                path: ROUTES.TERMINAL,
+                element: <TerminalPage />,
+                handle: { title: "B0 터미널", isRoot: true },
+              },
+              {
+                path: "/terminal/booking/:cityId",
+                element: <TicketBookingPage />,
+                handle: { title: "비행선 예매", isRoot: false },
               },
               {
                 path: "*",
