@@ -22,7 +22,13 @@ export function CityInfo({ city, icon, gradient }: CityInfoProps) {
       <h2 className="mb-1 text-2xl font-semibold text-white">{city.name}</h2>
       <p className="text-b0-light-purple mb-2 text-sm">{city.theme}</p>
       <p className="text-sm leading-relaxed text-zinc-400">
-        {city.description || "노을빛 항구 마을에서\\n소중한 인연을 만나요"}
+        {city.description || (
+          <>
+            노을빛 항구 마을에서
+            <br />
+            소중한 인연을 만나요
+          </>
+        )}
       </p>
     </div>
   );

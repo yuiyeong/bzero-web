@@ -1,4 +1,4 @@
-import CityCard from "@/components/terminal/city-card.tsx";
+import { CityCard } from "@/components/terminal/city-card.tsx";
 import type { City } from "@/types.ts";
 
 interface CityListProps {

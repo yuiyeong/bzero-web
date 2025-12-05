@@ -5,9 +5,11 @@ import { CityList } from "@/components/terminal/city-list.tsx";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useActiveCities } from "@/hooks/queries/use-active-cities.ts";
 
+const CITIES_PER_PAGE = 20;
+
 export default function TerminalPage() {
   const { data: user } = useMe();
-  const { data, isLoading, isError } = useActiveCities(0, 20);
+  const { data, isLoading, isError } = useActiveCities(0, CITIES_PER_PAGE);
 
   return (
     <div className="relative -mx-6 flex h-full flex-col">

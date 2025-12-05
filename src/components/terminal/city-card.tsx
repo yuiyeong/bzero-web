@@ -1,37 +1,24 @@
 import { useNavigate } from "react-router";
+import { getCityIcon, getCityGradient } from "@/lib/city-theme.ts";
+import { ROUTES } from "@/lib/routes.ts";
+import { AIRSHIP_OPTIONS } from "@/lib/airship.ts";
 import type { City } from "@/types.ts";
 
 interface CityCardProps {
   city: City;
 }
 
-// 도시별 아이콘 매핑
-const CITY_ICONS: Record<string, string> = {
-  세렌시아: "🌅",
-  로렌시아: "🌲",
-  엠마시아: "☀️",
-  다마린: "🌊",
-  갈리시아: "🌟",
-};
+const STANDARD_AIRSHIP = AIRSHIP_OPTIONS[0]; // 일반 비행선
 
-// 도시별 그라데이션 클래스
-const CITY_GRADIENTS: Record<string, string> = {
-  세렌시아: "from-[#f97316] to-[#fbbf24]",
-  로렌시아: "from-[#22c55e] to-[#16a34a]",
-  엠마시아: "from-[#facc15] to-[#fde68a]",
-  다마린: "from-[#3b82f6] to-[#60a5fa]",
-  갈리시아: "from-[#a855f7] to-[#c084fc]",
-};
-
-export default function CityCard({ city }: CityCardProps) {
+export function CityCard({ city }: CityCardProps) {
   const navigate = useNavigate();
-  const icon = CITY_ICONS[city.name] || "🏙️";
-  const gradient = CITY_GRADIENTS[city.name] || "from-purple-600 to-purple-400";
+  const icon = getCityIcon(city.name);
+  const gradient = getCityGradient(city.name);
   const isComingSoon = !city.is_active;
 
   const handleBookingClick = () => {
     if (isComingSoon) return;
-    navigate(`/terminal/booking/${city.city_id}`, { state: { city } });
+    navigate(ROUTES.TICKET_BOOKING.replace(":cityId", city.city_id), { state: { city } });
   };
 
   return (
@@ -67,7 +54,7 @@ export default function CityCard({ city }: CityCardProps) {
           </div>
           <div>
             <div className="mb-0.5 text-[10px] tracking-wider text-zinc-500 uppercase">소요</div>
-            <div className="text-sm font-medium text-zinc-300">{isComingSoon ? "-" : "5분"}</div>
+            <div className="text-sm font-medium text-zinc-300">{isComingSoon ? "-" : STANDARD_AIRSHIP.duration}</div>
           </div>
         </div>
         <button
@@ -87,7 +74,7 @@ export default function CityCard({ city }: CityCardProps) {
             <>
               <span className="text-[10px] opacity-80">일반석</span>
               <br />
-              300P
+              {STANDARD_AIRSHIP.price}P
             </>
           )}
         </button>
