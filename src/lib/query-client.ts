@@ -5,6 +5,11 @@ export const queryKeys = {
     all: ["user"],
     detail: ["user", "me"],
   },
+  cities: {
+    all: ["cities"],
+    active: ["cities", "active"],
+    detail: (cityId: string) => ["cities", cityId],
+  },
 } as const;
 
 export const queryClient = new QueryClient();
