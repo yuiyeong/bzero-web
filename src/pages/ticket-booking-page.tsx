@@ -5,7 +5,7 @@ import { CityInfo } from "@/components/booking/city-info.tsx";
 import { AirshipSelector } from "@/components/booking/airship-selector.tsx";
 import { PaymentSummary } from "@/components/booking/payment-summary.tsx";
 import { PurchaseButton } from "@/components/booking/purchase-button.tsx";
-import { getCityIcon, getCityGradient } from "@/lib/city-theme.ts";
+import { getCityGradient } from "@/lib/city-theme.ts";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
 import { AIRSHIP_OPTIONS, type AirshipType } from "@/lib/airship.ts";
@@ -30,7 +30,6 @@ export default function TicketBookingPage() {
   const remainingPoints = (user?.current_points ?? 0) - selectedOption.price;
   const hasEnoughPoints = remainingPoints >= 0;
 
-  const icon = city ? getCityIcon(city.name) : "🏙️";
   const gradient = city ? getCityGradient(city.name) : "from-purple-600 to-purple-400";
 
   const handlePurchase = () => {
@@ -48,7 +47,7 @@ export default function TicketBookingPage() {
 
   return (
     <div className="-mx-6 flex h-full flex-col px-6 py-6">
-      <CityInfo city={city} icon={icon} gradient={gradient} />
+      <CityInfo city={city} gradient={gradient} />
       <AirshipSelector selectedType={selectedType} onSelectType={setSelectedType} />
       <PaymentSummary
         currentPoints={user?.current_points ?? 0}
