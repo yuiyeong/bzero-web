@@ -16,11 +16,7 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const { mutate: signUp, isPending } = useSignUp({
     onSuccess: () => {
-      // 이메일 인증 페이지로 이메일과 비밀번호 전달
-      navigate(ROUTES.EMAIL_VERIFICATION, {
-        replace: true,
-        state: { email, password },
-      });
+      navigate(ROUTES.EMAIL_VERIFICATION, { replace: true });
     },
     onError: (e: AuthError) => {
       toast.error(generateAuthErrorMessage(e));

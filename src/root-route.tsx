@@ -12,7 +12,6 @@ import GuestGuard from "@/components/guards/guest-guard.tsx";
 import AuthGuard from "@/components/guards/auth-guard.tsx";
 import AuthPage from "@/pages/auth-page.tsx";
 import EmailVerificationPage from "@/pages/email-verification-page.tsx";
-import EmailConfirmedPage from "@/pages/email-confirmed-page.tsx";
 import { ROUTES } from "@/lib/routes.ts";
 
 export const router = createBrowserRouter([
@@ -50,11 +49,6 @@ export const router = createBrowserRouter([
                 handle: { title: "이메일 확인", isRoot: true },
               },
             ],
-          },
-          {
-            path: ROUTES.EMAIL_CONFIRMED,
-            element: <EmailConfirmedPage />,
-            handle: { title: "인증 완료", isRoot: true },
           },
           {
             element: <AuthGuard />,

@@ -10,23 +10,8 @@ import type { AuthCredentials } from "@/types.ts";
  *
  * 회원가입 후 이메일 인증이 필요함
  */
-/**
- * 이메일/비밀번호로 회원가입
- *
- * 회원가입 후 이메일 인증이 필요함
- * 이메일 인증 완료 후 emailRedirectTo로 리다이렉트됨
- */
 export async function signUp({ email, password }: AuthCredentials): Promise<AuthResponse["data"]> {
-  // 이메일 인증 완료 후 리다이렉트할 URL
-  const emailRedirectTo = `${window.location.origin}/auth/email-confirmed`;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo,
-    },
-  });
+  const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) throw error;
 
