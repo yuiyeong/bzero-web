@@ -16,6 +16,8 @@ export const ROUTES = {
   SIGN_UP: "/auth/sign-up",
   /** 이메일 인증 안내 페이지 */
   EMAIL_VERIFICATION: "/auth/email-verification",
+  /** 이메일 인증 완료 페이지 */
+  EMAIL_CONFIRMED: "/auth/email-confirmed",
   /** 프로필 완성 페이지 (닉네임, 이모지 설정) */
   PROFILE_COMPLETION: "/profile-completion",
   /** B0 비행선 터미널 홈 */
