@@ -4,15 +4,6 @@
  * 도시 이름을 키로 하여 아이콘과 그라데이션 클래스를 매핑합니다.
  */
 
-/** 도시별 아이콘 매핑 */
-export const CITY_ICONS: Record<string, string> = {
-  세렌시아: "🌅",
-  로렌시아: "🌲",
-  엠마시아: "☀️",
-  다마린: "🌊",
-  갈리시아: "🌟",
-};
-
 /** 도시별 그라데이션 클래스 */
 export const CITY_GRADIENTS: Record<string, string> = {
   세렌시아: "from-[#f97316] to-[#fbbf24]",
@@ -21,16 +12,6 @@ export const CITY_GRADIENTS: Record<string, string> = {
   다마린: "from-[#3b82f6] to-[#60a5fa]",
   갈리시아: "from-[#a855f7] to-[#c084fc]",
 };
-
-/**
- * 도시 이름으로 아이콘을 가져옵니다
- *
- * @param cityName - 도시 이름
- * @returns 해당 도시의 아이콘 (없으면 기본 아이콘)
- */
-export function getCityIcon(cityName: string): string {
-  return CITY_ICONS[cityName] || "🏙️";
-}
 
 /**
  * 도시 이름으로 그라데이션 클래스를 가져옵니다

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { getCityIcon, getCityGradient } from "@/lib/city-theme.ts";
+import { getCityGradient } from "@/lib/city-theme.ts";
 import { ROUTES } from "@/lib/routes.ts";
 import { AIRSHIP_OPTIONS } from "@/lib/airship.ts";
 import type { City } from "@/types.ts";
@@ -12,7 +12,6 @@ const STANDARD_AIRSHIP = AIRSHIP_OPTIONS[0]; // 일반 비행선
 
 export function CityCard({ city }: CityCardProps) {
   const navigate = useNavigate();
-  const icon = getCityIcon(city.name);
   const gradient = getCityGradient(city.name);
   const isComingSoon = !city.is_active;
 
@@ -31,9 +30,15 @@ export function CityCard({ city }: CityCardProps) {
 
       {/* 상단: 도시 정보 */}
       <div className="border-border flex items-center gap-4 border-b border-dashed p-5">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br text-2xl ${gradient}`}>
-          {icon}
-        </div>
+        {city.image_url ? (
+          <div className="h-12 w-12 overflow-hidden rounded-xl">
+            <img src={city.image_url} alt={`${city.name} 아이콘`} className="h-full w-full object-cover" />
+          </div>
+        ) : (
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient}`}>
+            <span className="text-2xl">🏙️</span>
+          </div>
+        )}
         <div className="flex-1">
           <div className="mb-0.5 text-lg font-semibold text-white">{city.name}</div>
           <div className="text-b0-light-purple text-sm">{city.theme}</div>
