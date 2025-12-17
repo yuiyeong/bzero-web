@@ -10,6 +10,9 @@ export const queryKeys = {
     active: ["cities", "active"],
     detail: (cityId: string) => ["cities", cityId],
   },
+  airships: {
+    all: ["airships"],
+  },
 } as const;
 
 export const queryClient = new QueryClient();
