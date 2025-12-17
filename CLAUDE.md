@@ -224,7 +224,7 @@ export async function getMe(): Promise<User> {
 // 단일 데이터 조회 예시
 export async function getMe(): Promise<User> {
   const { data } = await apiClient.get<DataResponse<User>>("/users/me");
-  return data.data;  // DataResponse에서 data 추출
+  return data.data; // DataResponse에서 data 추출
 }
 
 // 목록 데이터 조회 예시
@@ -232,7 +232,7 @@ export async function getActiveCities(offset = 0, limit = 20): Promise<ListRespo
   const { data } = await apiClient.get<ListResponse<City>>("/cities", {
     params: { offset, limit },
   });
-  return data;  // ListResponse 전체 반환 (list + pagination)
+  return data; // ListResponse 전체 반환 (list + pagination)
 }
 ```
 
@@ -822,18 +822,18 @@ export const ROUTES = {
 
 ### 현재 라우트 구조
 
-| 경로                       | 페이지                | 가드       | 설명                             |
-| -------------------------- | --------------------- | ---------- | -------------------------------- |
-| `/onboarding`              | OnboardingPage        | 없음       | 온보딩 페이지                    |
-| `/auth`                    | AuthPage              | GuestGuard | 인증 시작 (로그인/회원가입 선택) |
-| `/auth/sign-in`            | SignInPage            | GuestGuard | 로그인                           |
-| `/auth/sign-up`            | SignUpPage            | GuestGuard | 회원가입                         |
-| `/auth/email-verification` | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
-| `/auth/email-confirmed`    | EmailConfirmedPage    | 없음       | 이메일 인증 완료                 |
-| `/`                        | IndexPage             | AuthGuard  | 홈 (메인)                        |
-| `/profile-completion`      | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
-| `/terminal`                | TerminalPage          | AuthGuard  | B0 비행선 터미널                 |
-| `/terminal/booking/:cityId`| TicketBookingPage     | AuthGuard  | 비행선 티켓 예매                 |
+| 경로                        | 페이지                | 가드       | 설명                             |
+| --------------------------- | --------------------- | ---------- | -------------------------------- |
+| `/onboarding`               | OnboardingPage        | 없음       | 온보딩 페이지                    |
+| `/auth`                     | AuthPage              | GuestGuard | 인증 시작 (로그인/회원가입 선택) |
+| `/auth/sign-in`             | SignInPage            | GuestGuard | 로그인                           |
+| `/auth/sign-up`             | SignUpPage            | GuestGuard | 회원가입                         |
+| `/auth/email-verification`  | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
+| `/auth/email-confirmed`     | EmailConfirmedPage    | 없음       | 이메일 인증 완료                 |
+| `/`                         | IndexPage             | AuthGuard  | 홈 (메인)                        |
+| `/profile-completion`       | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
+| `/terminal`                 | TerminalPage          | AuthGuard  | B0 비행선 터미널                 |
+| `/terminal/booking/:cityId` | TicketBookingPage     | AuthGuard  | 비행선 티켓 예매                 |
 
 ### 라우트 핸들
 
@@ -906,18 +906,11 @@ export interface City {
 
 ```css
 /* 브랜드 주요 색상 */
---b0-purple: #9333EA      /* 메인 보라색 */
---b0-light-purple: #C084FC /* 밝은 보라색 */
---b0-pink-purple: #F0ABFC  /* 핑크 보라색 */
---b0-deep-navy: #0F0F23    /* 딥 네이비 (배경) */
---b0-card-navy: #1A1B3C    /* 카드 네이비 */
-
-/* 도시별 테마 색상 */
---city-serensia: #F97316   /* 관계, 노을빛 오렌지 */
---city-lorensia: #22C55E   /* 회복, 숲 초록 */
---city-emmasia: #84CC16    /* 희망, 밝은 라임 */
---city-damarin: #64748B    /* 고요, 안개 슬레이트 */
---city-galicia: #F59E0B    /* 성찰, 황금빛 앰버 */
+--b0-purple: #9333ea /* 메인 보라색 */ --b0-light-purple: #c084fc /* 밝은 보라색 */ --b0-pink-purple: #f0abfc
+  /* 핑크 보라색 */ --b0-deep-navy: #0f0f23 /* 딥 네이비 (배경) */ --b0-card-navy: #1a1b3c /* 카드 네이비 */
+  /* 도시별 테마 색상 */ --city-serensia: #f97316 /* 관계, 노을빛 오렌지 */ --city-lorensia: #22c55e /* 회복, 숲 초록 */
+  --city-emmasia: #84cc16 /* 희망, 밝은 라임 */ --city-damarin: #64748b /* 고요, 안개 슬레이트 */
+  --city-galicia: #f59e0b /* 성찰, 황금빛 앰버 */;
 ```
 
 ### Tailwind 유틸리티 클래스

@@ -28,7 +28,7 @@ export function PurchaseButton({ hasEnoughPoints, isPending = false, onPurchase 
           "w-full rounded-lg py-4 text-base font-semibold transition-colors",
           isDisabled
             ? "cursor-not-allowed bg-zinc-700 text-zinc-400"
-            : "bg-b0-purple text-white hover:bg-b0-light-purple"
+            : "bg-b0-purple hover:bg-b0-light-purple text-white"
         )}
       >
         {isPending ? "처리 중..." : "🎫 비행선 탑승하기"}

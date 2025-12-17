@@ -4,7 +4,7 @@ import { ROUTES } from "@/lib/routes.ts";
 
 export default function AuthPage() {
   return (
-    <div className="flex h-full flex-col gap-4 py-12">
+    <div className="flex h-full flex-col gap-4 px-6 py-12">
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div className="text-primary text-3xl font-bold">B0</div>
         <div>"당신의 마음이 잠시 쉬어갈 곳"</div>
