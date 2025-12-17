@@ -1,14 +1,19 @@
+import { cn } from "@/lib/utils.ts";
+
 interface PurchaseButtonProps {
   hasEnoughPoints: boolean;
+  isPending?: boolean;
   onPurchase: () => void;
 }
 
 /**
  * 비행선 구매 버튼 컴포넌트
  *
- * 포인트 부족 시 비활성화
+ * 포인트 부족 또는 요청 중일 때 비활성화
  */
-export function PurchaseButton({ hasEnoughPoints, onPurchase }: PurchaseButtonProps) {
+export function PurchaseButton({ hasEnoughPoints, isPending = false, onPurchase }: PurchaseButtonProps) {
+  const isDisabled = !hasEnoughPoints || isPending;
+
   return (
     <div className="mt-auto">
       {!hasEnoughPoints && (
@@ -17,13 +22,16 @@ export function PurchaseButton({ hasEnoughPoints, onPurchase }: PurchaseButtonPr
         </div>
       )}
       <button
-        disabled={!hasEnoughPoints}
+        disabled={isDisabled}
         onClick={onPurchase}
-        className={`w-full rounded-lg py-4 text-base font-semibold text-white transition-colors ${
-          hasEnoughPoints ? "bg-b0-purple hover:bg-b0-light-purple" : "cursor-not-allowed bg-zinc-700 text-zinc-400"
-        }`}
+        className={cn(
+          "w-full rounded-lg py-4 text-base font-semibold transition-colors",
+          isDisabled
+            ? "cursor-not-allowed bg-zinc-700 text-zinc-400"
+            : "bg-b0-purple text-white hover:bg-b0-light-purple"
+        )}
       >
-        🎫 비행선 탑승하기
+        {isPending ? "처리 중..." : "🎫 비행선 탑승하기"}
       </button>
     </div>
   );
