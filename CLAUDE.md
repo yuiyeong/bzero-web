@@ -940,6 +940,7 @@ export interface City {
 - 새로운 API 함수 추가 시 JSDoc 주석 작성
 - 새로운 훅 추가 시 적절한 디렉토리에 파일 생성 (`queries/` 또는 `mutations/`)
 - 새로운 라우트 추가 시 `ROUTES` 상수에 먼저 정의
+- **백엔드 API 스펙 확인 시 반드시 OpenAPI 문서 참조**: https://api.basementzero.cloud/openapi.json
 
 ## 안티 패턴 (하지 말아야 할 것)
 
