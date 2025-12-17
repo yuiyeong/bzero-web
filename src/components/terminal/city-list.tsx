@@ -1,8 +1,10 @@
 import { CityCard } from "@/components/terminal/city-card.tsx";
-import type { City } from "@/types.ts";
+import type { Airship, City } from "@/types.ts";
 
 interface CityListProps {
   cities: City[];
+  /** 기본 비행선 (cost_factor가 가장 낮은 비행선) */
+  baseAirship: Airship | null;
   isLoading: boolean;
   isError: boolean;
 }
@@ -12,7 +14,7 @@ interface CityListProps {
  *
  * 도시 목록, 로딩 상태, 에러 상태를 처리
  */
-export function CityList({ cities, isLoading, isError }: CityListProps) {
+export function CityList({ cities, baseAirship, isLoading, isError }: CityListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -32,7 +34,7 @@ export function CityList({ cities, isLoading, isError }: CityListProps) {
   return (
     <div className="space-y-4">
       {cities.map((city) => (
-        <CityCard key={city.city_id} city={city} />
+        <CityCard key={city.city_id} city={city} baseAirship={baseAirship} />
       ))}
     </div>
   );

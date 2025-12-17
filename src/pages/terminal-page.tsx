@@ -4,12 +4,28 @@ import { TerminalInfo } from "@/components/terminal/terminal-info.tsx";
 import { CityList } from "@/components/terminal/city-list.tsx";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useActiveCities } from "@/hooks/queries/use-active-cities.ts";
+import { useAirships } from "@/hooks/queries/use-airships.ts";
+import type { Airship } from "@/types.ts";
 
 const CITIES_PER_PAGE = 20;
 
 export default function TerminalPage() {
   const { data: user } = useMe();
-  const { data, isLoading, isError } = useActiveCities(0, CITIES_PER_PAGE);
+  const {
+    data: cityListData,
+    isLoading: isCitiesLoading,
+    isError: isCitiesError,
+  } = useActiveCities(0, CITIES_PER_PAGE);
+  const { data: airshipListData, isLoading: isAirshipsLoading, isError: isAirshipsError } = useAirships();
+
+  const airships: Airship[] = airshipListData?.list ?? [];
+
+  // 기본 비행선: cost_factor가 가장 낮은 비행선
+  const baseAirship =
+    airships.length > 0 ? airships.reduce((min, a) => (a.cost_factor < min.cost_factor ? a : min), airships[0]) : null;
+
+  const isLoading = isCitiesLoading || isAirshipsLoading;
+  const isError = isCitiesError || isAirshipsError;
 
   return (
     <div className="relative -mx-6 flex h-full flex-col">
@@ -24,7 +40,7 @@ export default function TerminalPage() {
       <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-5">
         <TerminalTitle />
         <TerminalInfo />
-        <CityList cities={data?.list ?? []} isLoading={isLoading} isError={isError} />
+        <CityList cities={cityListData?.list ?? []} baseAirship={baseAirship} isLoading={isLoading} isError={isError} />
       </div>
     </div>
   );

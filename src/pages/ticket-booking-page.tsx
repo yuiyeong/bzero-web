@@ -5,10 +5,9 @@ import { CityInfo } from "@/components/booking/city-info.tsx";
 import { AirshipSelector } from "@/components/booking/airship-selector.tsx";
 import { PaymentSummary } from "@/components/booking/payment-summary.tsx";
 import { PurchaseButton } from "@/components/booking/purchase-button.tsx";
-import { getCityGradient } from "@/lib/city-theme.ts";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
-import { AIRSHIP_OPTIONS, type AirshipType } from "@/lib/airship.ts";
+import { useAirships } from "@/hooks/queries/use-airships.ts";
 import type { City } from "@/types.ts";
 
 export default function TicketBookingPage() {
@@ -16,28 +15,39 @@ export default function TicketBookingPage() {
   const location = useLocation();
   const cityFromState = location.state?.city as City | undefined;
 
-  const [selectedType, setSelectedType] = useState<AirshipType>("standard");
+  const [selectedAirshipId, setSelectedAirshipId] = useState<string | null>(null);
 
   const { data: user } = useMe();
+  const { data: airshipsData, isLoading: isAirshipsLoading } = useAirships();
+
+  const airships = airshipsData?.list ?? [];
 
   // state로 전달된 city가 없으면 API로 조회
-  const { data: cityFromApi, isLoading } = useCity(cityId, {
+  const { data: cityFromApi, isLoading: isCityLoading } = useCity(cityId, {
     enabled: !cityFromState,
   });
 
   const city = cityFromState || cityFromApi;
-  const selectedOption = AIRSHIP_OPTIONS.find((opt) => opt.type === selectedType)!;
-  const remainingPoints = (user?.current_points ?? 0) - selectedOption.price;
+  const isLoading = isCityLoading || isAirshipsLoading;
+
+  // 선택된 비행선 찾기 (없으면 첫 번째 비행선 자동 선택)
+  const selectedAirship = airships.find((a) => a.airship_id === selectedAirshipId) ?? airships[0] ?? null;
+
+  // 티켓 가격 계산: city.base_cost_points × airship.cost_factor
+  const ticketPrice = city && selectedAirship ? city.base_cost_points * selectedAirship.cost_factor : 0;
+  const remainingPoints = (user?.current_points ?? 0) - ticketPrice;
   const hasEnoughPoints = remainingPoints >= 0;
 
-  const gradient = city ? getCityGradient(city.name) : "from-purple-600 to-purple-400";
+  const handleSelectAirship = (airshipId: string) => {
+    setSelectedAirshipId(airshipId);
+  };
 
   const handlePurchase = () => {
     // TODO: 티켓 구매 API 호출
     toast.info("티켓 구매 기능은 곧 제공될 예정입니다.");
   };
 
-  if (isLoading || !city) {
+  if (isLoading || !city || airships.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-zinc-400">로딩 중...</div>
@@ -47,11 +57,16 @@ export default function TicketBookingPage() {
 
   return (
     <div className="-mx-6 flex h-full flex-col px-6 py-6">
-      <CityInfo city={city} gradient={gradient} />
-      <AirshipSelector selectedType={selectedType} onSelectType={setSelectedType} />
+      <CityInfo city={city} gradient="from-purple-600 to-purple-400" />
+      <AirshipSelector
+        airships={airships}
+        selectedAirshipId={selectedAirship?.airship_id ?? null}
+        baseCostPoints={city.base_cost_points}
+        onSelectAirship={handleSelectAirship}
+      />
       <PaymentSummary
         currentPoints={user?.current_points ?? 0}
-        ticketPrice={selectedOption.price}
+        ticketPrice={ticketPrice}
         remainingPoints={remainingPoints}
         hasEnoughPoints={hasEnoughPoints}
       />

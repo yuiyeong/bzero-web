@@ -1,19 +1,20 @@
+import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
 import { useNavigate } from "react-router";
-import { getCityGradient } from "@/lib/city-theme.ts";
 import { ROUTES } from "@/lib/routes.ts";
-import { AIRSHIP_OPTIONS } from "@/lib/airship.ts";
-import type { City } from "@/types.ts";
+import type { Airship, City } from "@/types.ts";
 
 interface CityCardProps {
   city: City;
+  /** 기본 비행선 (cost_factor가 가장 낮은 비행선) */
+  baseAirship: Airship | null;
 }
 
-const STANDARD_AIRSHIP = AIRSHIP_OPTIONS[0]; // 일반 비행선
-
-export function CityCard({ city }: CityCardProps) {
+export function CityCard({ city, baseAirship }: CityCardProps) {
   const navigate = useNavigate();
-  const gradient = getCityGradient(city.name);
   const isComingSoon = !city.is_active;
+
+  // 가격 계산: city.base_cost_points × airship.cost_factor
+  const price = baseAirship ? city.base_cost_points * baseAirship.cost_factor : 0;
 
   const handleBookingClick = () => {
     if (isComingSoon) return;
@@ -31,11 +32,16 @@ export function CityCard({ city }: CityCardProps) {
       {/* 상단: 도시 정보 */}
       <div className="border-border flex items-center gap-4 border-b border-dashed p-5">
         {city.image_url ? (
-          <div className="h-12 w-12 overflow-hidden rounded-xl">
-            <img src={city.image_url} alt={`${city.name} 아이콘`} className="h-full w-full object-cover" />
-          </div>
+          <ImageWithSkeleton
+            src={city.image_url}
+            alt={`${city.name} 아이콘`}
+            className="h-12 w-12 rounded-xl"
+            fallback={<span className="text-2xl">🏙️</span>}
+          />
         ) : (
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient}`}>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-400`}
+          >
             <span className="text-2xl">🏙️</span>
           </div>
         )}
@@ -59,7 +65,9 @@ export function CityCard({ city }: CityCardProps) {
           </div>
           <div>
             <div className="mb-0.5 text-[10px] tracking-wider text-zinc-500 uppercase">소요</div>
-            <div className="text-sm font-medium text-zinc-300">{isComingSoon ? "-" : STANDARD_AIRSHIP.duration}</div>
+            <div className="text-sm font-medium text-zinc-300">
+              {isComingSoon || !baseAirship ? "-" : (baseAirship.description ?? "-")}
+            </div>
           </div>
         </div>
         <button
@@ -77,9 +85,9 @@ export function CityCard({ city }: CityCardProps) {
             </>
           ) : (
             <>
-              <span className="text-[10px] opacity-80">일반석</span>
+              <span className="text-[10px] opacity-80">{baseAirship?.name ?? "일반석"}</span>
               <br />
-              {STANDARD_AIRSHIP.price}P
+              {price}P
             </>
           )}
         </button>

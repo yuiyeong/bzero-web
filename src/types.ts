@@ -84,8 +84,30 @@ export interface City {
   theme: string;
   description: string | null;
   image_url: string | null;
+  /** 기본 비용 (포인트) */
+  base_cost_points: number;
+  /** 기본 소요 시간 (시간) */
+  base_duration_hours: number;
   is_active: boolean;
   display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================================
+// 비행선 관련 타입
+// ============================================================================
+
+/** 비행선 정보 */
+export interface Airship {
+  airship_id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  /** 비용 계수 (티켓 가격 = city.base_cost_points × cost_factor) */
+  cost_factor: number;
+  /** 시간 계수 (소요 시간 = city.base_duration_hours / duration_factor) */
+  duration_factor: number;
   created_at: string;
   updated_at: string;
 }
