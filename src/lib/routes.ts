@@ -24,4 +24,8 @@ export const ROUTES = {
   TERMINAL: "/terminal",
   /** 비행선 티켓 예매 */
   TICKET_BOOKING: "/terminal/booking/:cityId",
+  /** 비행선 탑승 중 (이동 화면) */
+  BOARDING: "/boarding",
+  /** 게스트하우스 */
+  GUESTHOUSE: "/guesthouses/:guesthouseId",
 } as const;

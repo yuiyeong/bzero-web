@@ -13,6 +13,14 @@ export const queryKeys = {
   airships: {
     all: ["airships"],
   },
+  tickets: {
+    all: ["tickets"],
+    boarding: ["tickets", "boarding"],
+  },
+  roomStays: {
+    all: ["roomStays"],
+    current: ["roomStays", "current"],
+  },
 } as const;
 
 export const queryClient = new QueryClient();
