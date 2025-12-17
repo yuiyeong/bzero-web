@@ -14,9 +14,11 @@ export function usePurchaseTicket(callback?: UseMutationCallback<Ticket, B0ApiEr
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: purchaseTicket,
-    onSuccess: (data: Ticket) => {
+    onSuccess: async (data: Ticket) => {
       // 사용자 정보 캐시 무효화 (포인트가 차감되므로 다시 조회)
-      queryClient.invalidateQueries({ queryKey: queryKeys.me.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.me.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.tickets.all });
+
       callback?.onSuccess?.(data);
     },
     onError: (error: B0ApiError) => {

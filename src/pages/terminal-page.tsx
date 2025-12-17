@@ -28,7 +28,7 @@ export default function TerminalPage() {
   const isError = isCitiesError || isAirshipsError;
 
   return (
-    <div className="relative -mx-6 flex h-full flex-col">
+    <div className="relative -mx-6 flex h-full flex-col px-6">
       {/* 배경 효과 */}
       <div className="from-b0-purple/15 absolute top-0 right-0 left-0 h-[180px] overflow-hidden bg-gradient-to-b to-transparent">
         <div className="bg-b0-light-purple/30 absolute top-5 left-1/2 h-[120px] w-[200px] -translate-x-1/2 rounded-full blur-3xl" />

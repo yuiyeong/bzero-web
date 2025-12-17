@@ -26,7 +26,7 @@ export default function TicketBookingPage() {
   const { mutate: purchaseTicket, isPending } = usePurchaseTicket({
     onSuccess: (ticket) => {
       toast.success(`${ticket.city.name}행 티켓이 발권되었습니다.`);
-      navigate(ROUTES.HOME, { replace: true });
+      navigate(ROUTES.BOARDING, { replace: true });
     },
     onError: (error: B0ApiError) => {
       toast.error(error.message);

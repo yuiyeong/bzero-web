@@ -162,3 +162,27 @@ export interface PurchaseTicketRequestBody {
   city_id: string;
   airship_id: string;
 }
+
+// ============================================================================
+// 체류(RoomStay) 관련 타입
+// ============================================================================
+
+/** 체류 상태 */
+export type RoomStayStatus = "checked_in" | "checked_out" | "extended";
+
+/** 체류 정보 (백엔드 RoomStay 모델과 동일) */
+export interface RoomStay {
+  room_stay_id: string;
+  user_id: string;
+  city_id: string;
+  guest_house_id: string;
+  room_id: string;
+  ticket_id: string;
+  status: RoomStayStatus;
+  check_in_at: string;
+  scheduled_check_out_at: string;
+  actual_check_out_at: string | null;
+  extension_count: number;
+  created_at: string;
+  updated_at: string;
+}

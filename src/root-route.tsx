@@ -6,10 +6,13 @@ import ProfileCompletionPage from "@/pages/profile-completion-page.tsx";
 import IndexPage from "@/pages/index-page.tsx";
 import TerminalPage from "@/pages/terminal-page.tsx";
 import TicketBookingPage from "@/pages/ticket-booking-page.tsx";
+import BoardingPage from "@/pages/boarding-page.tsx";
+import GuesthousePage from "@/pages/guesthouse-page.tsx";
 import MainLayout from "@/components/layout/main-layout.tsx";
 import OnboardingGuard from "@/components/guards/onboarding-guard.tsx";
 import GuestGuard from "@/components/guards/guest-guard.tsx";
 import AuthGuard from "@/components/guards/auth-guard.tsx";
+import TravelStatusGuard from "@/components/guards/travel-status-guard.tsx";
 import AuthPage from "@/pages/auth-page.tsx";
 import EmailVerificationPage from "@/pages/email-verification-page.tsx";
 import EmailConfirmedPage from "@/pages/email-confirmed-page.tsx";
@@ -59,29 +62,46 @@ export const router = createBrowserRouter([
           {
             element: <AuthGuard />,
             children: [
-              {
-                path: ROUTES.HOME,
-                element: <IndexPage />,
-                handle: { title: "홈", isRoot: true },
-              },
+              // TravelStatusGuard 밖: 프로필 설정
               {
                 path: ROUTES.PROFILE_COMPLETION,
                 element: <ProfileCompletionPage />,
                 handle: { title: "프로필 설정", isRoot: false },
               },
+              // TravelStatusGuard 안: 여행 상태에 따라 리다이렉트
               {
-                path: ROUTES.TERMINAL,
-                element: <TerminalPage />,
-                handle: { title: "B0 터미널", isRoot: true },
-              },
-              {
-                path: ROUTES.TICKET_BOOKING,
-                element: <TicketBookingPage />,
-                handle: { title: "비행선 예매", isRoot: false },
-              },
-              {
-                path: "*",
-                element: <Navigate to={ROUTES.HOME} />,
+                element: <TravelStatusGuard />,
+                children: [
+                  {
+                    path: ROUTES.HOME,
+                    element: <IndexPage />,
+                    handle: { title: "홈", isRoot: true },
+                  },
+                  {
+                    path: ROUTES.TERMINAL,
+                    element: <TerminalPage />,
+                    handle: { title: "B0 터미널", isRoot: true },
+                  },
+                  {
+                    path: ROUTES.TICKET_BOOKING,
+                    element: <TicketBookingPage />,
+                    handle: { title: "비행선 예매", isRoot: false },
+                  },
+                  {
+                    path: ROUTES.BOARDING,
+                    element: <BoardingPage />,
+                    handle: { title: "탑승중", isRoot: true },
+                  },
+                  {
+                    path: ROUTES.GUESTHOUSE,
+                    element: <GuesthousePage />,
+                    handle: { title: "", isRoot: true },
+                  },
+                  {
+                    path: "*",
+                    element: <Navigate to={ROUTES.HOME} />,
+                  },
+                ],
               },
             ],
           },

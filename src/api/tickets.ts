@@ -15,3 +15,14 @@ export async function purchaseTicket(body: PurchaseTicketRequestBody): Promise<T
   const { data } = await apiClient.post<DataResponse<Ticket>>("/tickets", body);
   return data.data;
 }
+
+/**
+ * 현재 탑승 중인 티켓 조회
+ *
+ * @returns 탑승 중인 티켓 정보
+ * @throws {B0ApiError} NOT_FOUND - 탑승 중인 티켓이 없는 경우
+ */
+export async function getBoardingTicket(): Promise<Ticket> {
+  const { data } = await apiClient.get<DataResponse<Ticket>>("/tickets/mine/boarding");
+  return data.data;
+}

@@ -1,5 +1,6 @@
 import { Outlet, useMatches, useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
+import { cn } from "@/lib/utils.ts";
 
 interface RouteHandle {
   title?: string;
@@ -25,7 +26,7 @@ export default function MainLayout() {
           <div className="flex flex-1 items-center justify-center text-xl font-medium">{title}</div>
         </header>
       )}
-      <main className="flex flex-1 flex-col px-6">
+      <main className={cn("flex flex-1 flex-col", !isRoot && "px-6")}>
         <Outlet />
       </main>
     </div>
