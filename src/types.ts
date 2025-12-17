@@ -111,3 +111,54 @@ export interface Airship {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================================
+// 티켓 관련 타입
+// ============================================================================
+
+/** 티켓 상태 */
+export type TicketStatus = "boarding" | "completed" | "cancelled";
+
+/** 도시 스냅샷 (티켓 구매 시점의 도시 정보) */
+export interface CitySnapshot {
+  city_id: string;
+  name: string;
+  theme: string;
+  image_url: string | null;
+  description: string | null;
+}
+
+/** 비행선 스냅샷 (티켓 구매 시점의 비행선 정보) */
+export interface AirshipSnapshot {
+  airship_id: string;
+  name: string;
+  image_url: string | null;
+  description: string;
+}
+
+/** 티켓 정보 (백엔드 Ticket 모델과 동일) */
+export interface Ticket {
+  ticket_id: string;
+  /** 티켓 번호 (예: B0-2025-1234567890123) */
+  ticket_number: string;
+  /** 도시 스냅샷 */
+  city: CitySnapshot;
+  /** 비행선 스냅샷 */
+  airship: AirshipSnapshot;
+  /** 티켓 비용 (포인트) */
+  cost_points: number;
+  /** 티켓 상태 */
+  status: TicketStatus;
+  /** 출발 일시 */
+  departure_datetime: string;
+  /** 도착 일시 */
+  arrival_datetime: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 티켓 구매 요청 본문 */
+export interface PurchaseTicketRequestBody {
+  city_id: string;
+  airship_id: string;
+}

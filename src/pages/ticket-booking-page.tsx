@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { CityInfo } from "@/components/booking/city-info.tsx";
 import { AirshipSelector } from "@/components/booking/airship-selector.tsx";
@@ -8,17 +8,30 @@ import { PurchaseButton } from "@/components/booking/purchase-button.tsx";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
 import { useAirships } from "@/hooks/queries/use-airships.ts";
+import { usePurchaseTicket } from "@/hooks/mutations/use-purchase-ticket.ts";
+import type { B0ApiError } from "@/lib/api-errors.ts";
+import { ROUTES } from "@/lib/routes.ts";
 import type { City } from "@/types.ts";
 
 export default function TicketBookingPage() {
   const { cityId } = useParams<{ cityId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const cityFromState = location.state?.city as City | undefined;
 
   const [selectedAirshipId, setSelectedAirshipId] = useState<string | null>(null);
 
   const { data: user } = useMe();
   const { data: airshipsData, isLoading: isAirshipsLoading } = useAirships();
+  const { mutate: purchaseTicket, isPending } = usePurchaseTicket({
+    onSuccess: (ticket) => {
+      toast.success(`${ticket.city.name}행 티켓이 발권되었습니다.`);
+      navigate(ROUTES.HOME, { replace: true });
+    },
+    onError: (error: B0ApiError) => {
+      toast.error(error.message);
+    },
+  });
 
   const airships = airshipsData?.list ?? [];
 
@@ -43,8 +56,11 @@ export default function TicketBookingPage() {
   };
 
   const handlePurchase = () => {
-    // TODO: 티켓 구매 API 호출
-    toast.info("티켓 구매 기능은 곧 제공될 예정입니다.");
+    if (!city || !selectedAirship) return;
+    purchaseTicket({
+      city_id: city.city_id,
+      airship_id: selectedAirship.airship_id,
+    });
   };
 
   if (isLoading || !city || airships.length === 0) {
@@ -70,7 +86,7 @@ export default function TicketBookingPage() {
         remainingPoints={remainingPoints}
         hasEnoughPoints={hasEnoughPoints}
       />
-      <PurchaseButton hasEnoughPoints={hasEnoughPoints} onPurchase={handlePurchase} />
+      <PurchaseButton hasEnoughPoints={hasEnoughPoints} isPending={isPending} onPurchase={handlePurchase} />
     </div>
   );
 }
