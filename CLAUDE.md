@@ -54,6 +54,7 @@ pnpm format
 - **Type imports**: `import type { User } from './types'` 형식 사용
 - **any 타입**: 가능한 피하기 (경고 발생)
 - **사용하지 않는 변수**: `_` 접두사 사용 (예: `_event`)
+- **Import 확장자**: 로컬 파일 import 시 `.ts` 또는 `.tsx` 확장자 명시 (예: `@/types.ts`, `@/components/ui/button.tsx`)
 
 ### React
 
@@ -153,6 +154,8 @@ src/
 │   ├── guards/       # 라우트 가드 컴포넌트 (AuthGuard, GuestGuard 등)
 │   ├── layout/       # 레이아웃 컴포넌트 (MainLayout 등)
 │   ├── onboarding/   # 온보딩 관련 컴포넌트
+│   ├── terminal/     # B0 터미널 관련 컴포넌트 (도시 카드, 터미널 헤더 등)
+│   ├── booking/      # 티켓 예매 관련 컴포넌트 (비행선 선택, 결제 요약 등)
 │   └── ui/           # Shadcn UI 컴포넌트 (자동 생성)
 ├── hooks/            # 커스텀 훅
 │   ├── mutations/    # TanStack Query mutation 훅
@@ -213,8 +216,54 @@ export async function getMe(): Promise<User> {
 
 - 함수 상단에 JSDoc 주석 작성 (설명, @throws 등)
 - `apiClient` 인스턴스 사용 (자동으로 인증 토큰 첨부)
-- 응답에서 `data.data`를 추출하여 반환
+- **단일 데이터 반환**: `DataResponse<T>` 타입 사용 → `data.data` 추출하여 반환
+- **목록 데이터 반환**: `ListResponse<T>` 타입 사용 → `data` 직접 반환 (pagination 정보 포함)
 - Supabase 인증 API는 `src/api/auth.ts`에서 별도 관리
+
+```typescript
+// 단일 데이터 조회 예시
+export async function getMe(): Promise<User> {
+  const { data } = await apiClient.get<DataResponse<User>>("/users/me");
+  return data.data;  // DataResponse에서 data 추출
+}
+
+// 목록 데이터 조회 예시
+export async function getActiveCities(offset = 0, limit = 20): Promise<ListResponse<City>> {
+  const { data } = await apiClient.get<ListResponse<City>>("/cities", {
+    params: { offset, limit },
+  });
+  return data;  // ListResponse 전체 반환 (list + pagination)
+}
+```
+
+### queryKeys 구조 (`src/lib/query-client.ts`)
+
+TanStack Query의 쿼리 키는 도메인별로 그룹화하여 관리:
+
+```typescript
+export const queryKeys = {
+  me: {
+    all: ["user"],
+    detail: ["user", "me"],
+  },
+  cities: {
+    all: ["cities"],
+    active: ["cities", "active"],
+    detail: (cityId: string) => ["cities", cityId],
+  },
+  airships: {
+    all: ["airships"],
+  },
+} as const;
+```
+
+**규칙:**
+
+- 도메인별로 객체 그룹화 (`me`, `cities`, `airships` 등)
+- `all`: 해당 도메인의 기본/전체 목록용 키
+- `active`, `detail` 등: 특정 조건의 목록이나 상세 조회용 키
+- 파라미터가 필요한 경우 함수로 정의 (예: `detail: (cityId: string) => [...]`)
+- `as const`로 타입 안전성 확보
 
 ### TanStack Query 훅 패턴
 
@@ -245,10 +294,35 @@ export function useMe(): UseQueryResult<User, B0ApiError> {
 
 **규칙:**
 
-- 파일명: `use-{도메인}.ts` (예: `use-me.ts`)
-- 함수명: `use{도메인}` (예: `useMe`)
+- 파일명: `use-{도메인}.ts` (예: `use-me.ts`) 또는 `use-{형용사}-{도메인}.ts` (예: `use-active-cities.ts`)
+- 함수명: `use{도메인}` (예: `useMe`) 또는 `use{형용사}{도메인}` (예: `useActiveCities`)
+- **반환 타입 명시**: `UseQueryResult<T, B0ApiError>` 형태로 명시
 - JSDoc 주석으로 훅의 용도와 특이사항 설명
 - `queryKeys` 객체에서 쿼리 키 관리
+- **옵션이 필요한 경우**: `Use{도메인}Options` 인터페이스 정의
+
+```typescript
+// 옵션이 있는 Query 훅 예시
+interface UseCityOptions {
+  enabled?: boolean;
+}
+
+export function useCity(cityId: string | undefined, options?: UseCityOptions): UseQueryResult<City, B0ApiError> {
+  return useQuery({
+    queryKey: queryKeys.cities.detail(cityId || ""),
+    queryFn: () => getCityById(cityId!),
+    enabled: options?.enabled !== false && !!cityId,
+  });
+}
+
+// 목록 조회 Query 훅 예시
+export function useActiveCities(offset = 0, limit = 20): UseQueryResult<ListResponse<City>, B0ApiError> {
+  return useQuery({
+    queryKey: queryKeys.cities.active,
+    queryFn: () => getActiveCities(offset, limit),
+  });
+}
+```
 
 #### Mutation 훅 (`src/hooks/mutations/`)
 
@@ -355,6 +429,19 @@ export const useSetAuthSession = () => useAuthStore((store) => store.actions.set
 - 영속성 필요 시 `persist` 미들웨어 추가
 - 복잡한 상태 업데이트 시 `immer` 미들웨어 사용
 - **개별 셀렉터 훅 제공**: 상태별로 분리된 훅을 export하여 불필요한 리렌더링 방지
+
+**미들웨어 조합 순서:**
+
+```typescript
+// 기본 (devtools + combine)
+create(devtools(combine(initialState, (set) => ({ actions: { ... } }))))
+
+// 영속성 필요 시 (devtools + persist + combine)
+create(devtools(persist(combine(initialState, (set) => ({ ... })), { name: "storeName" })))
+
+// immer 사용 시 (devtools + persist + immer + combine)
+create(devtools(persist(immer(combine(initialState, (set) => ({ ... }))))))
+```
 
 ### 라우트 가드 패턴
 
@@ -491,6 +578,55 @@ export default function SignInPage() {
 - 에러 메시지는 `toast.error()`로 표시
 - `isPending` 상태로 입력 필드 및 버튼 비활성화
 
+### 로딩/에러 상태 처리 패턴
+
+페이지에서 여러 Query를 사용할 때의 로딩/에러 상태 통합 처리:
+
+```typescript
+export default function TerminalPage() {
+  const { data: cityListData, isLoading: isCitiesLoading, isError: isCitiesError } = useActiveCities();
+  const { data: airshipListData, isLoading: isAirshipsLoading, isError: isAirshipsError } = useAirships();
+
+  // 로딩/에러 상태 통합
+  const isLoading = isCitiesLoading || isAirshipsLoading;
+  const isError = isCitiesError || isAirshipsError;
+
+  // 데이터 추출 (기본값 제공)
+  const cities = cityListData?.list ?? [];
+  const airships = airshipListData?.list ?? [];
+
+  return (
+    <CityList cities={cities} isLoading={isLoading} isError={isError} />
+  );
+}
+```
+
+**리스트 컴포넌트에서 로딩/에러 처리:**
+
+```typescript
+interface CityListProps {
+  cities: City[];
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export function CityList({ cities, isLoading, isError }: CityListProps) {
+  if (isLoading) {
+    return <div className="text-zinc-400">로딩 중...</div>;
+  }
+
+  if (isError) {
+    return <div className="text-red-400">도시 목록을 불러오는데 실패했습니다.</div>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {cities.map((city) => <CityCard key={city.city_id} city={city} />)}
+    </div>
+  );
+}
+```
+
 ## UI 컴포넌트
 
 ### Shadcn UI
@@ -544,6 +680,44 @@ export function EmojiPicker({ value, onChange, disabled }: EmojiPickerProps) {
 - `cn()` 유틸리티로 조건부 클래스 적용
 - `disabled` prop 지원
 
+### 도메인별 컴포넌트 폴더 구조
+
+관련 컴포넌트들은 도메인별 폴더로 그룹화:
+
+```
+src/components/
+├── terminal/           # B0 터미널 관련
+│   ├── terminal-header.tsx
+│   ├── terminal-title.tsx
+│   ├── terminal-info.tsx
+│   ├── city-card.tsx
+│   └── city-list.tsx
+├── booking/            # 티켓 예매 관련
+│   ├── city-info.tsx
+│   ├── airship-selector.tsx
+│   ├── payment-summary.tsx
+│   └── purchase-button.tsx
+├── onboarding/         # 온보딩 관련
+│   ├── onboarding-slide.tsx
+│   ├── onboarding-slide-00.tsx
+│   └── ...
+└── guards/             # 라우트 가드
+    ├── auth-guard.tsx
+    ├── guest-guard.tsx
+    └── onboarding-guard.tsx
+```
+
+**도메인 폴더 생성 기준:**
+
+- 특정 페이지나 기능에서만 사용되는 컴포넌트가 3개 이상일 때
+- 페이지명 또는 기능명을 폴더명으로 사용 (예: `terminal`, `booking`)
+- 폴더 내 컴포넌트는 해당 도메인의 페이지에서만 사용
+
+**공통 컴포넌트 위치:**
+
+- 여러 페이지에서 사용되는 컴포넌트: `src/components/` 루트에 배치
+- 예: `global-loader.tsx`, `emoji-picker.tsx`, `email-status-message.tsx`
+
 ### 이미지 표시 (URL 기반)
 
 URL을 통해 이미지를 표시할 때는 반드시 `ImageWithSkeleton` 컴포넌트를 사용:
@@ -587,6 +761,42 @@ import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
 - 레이아웃: `MainLayout`으로 공통 헤더 관리
 - 라우트 핸들: `title`과 `isRoot` 속성 정의
 
+### 중첩 라우트 구조
+
+라우트는 Guard → Layout → 페이지 순서로 중첩:
+
+```typescript
+{
+  element: <OnboardingGuard />,  // 최상위 가드
+  children: [
+    {
+      element: <MainLayout />,   // 레이아웃
+      children: [
+        {
+          element: <GuestGuard />,  // 접근 제어 가드
+          children: [
+            { path: ROUTES.AUTH, element: <AuthPage /> },
+            { path: ROUTES.SIGN_IN, element: <SignInPage /> },
+          ],
+        },
+        {
+          element: <AuthGuard />,   // 인증 가드
+          children: [
+            { path: ROUTES.HOME, element: <IndexPage /> },
+            { path: ROUTES.TERMINAL, element: <TerminalPage /> },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+**가드 적용 순서:**
+
+1. `OnboardingGuard`: 온보딩 완료 여부 확인
+2. `GuestGuard` 또는 `AuthGuard`: 인증 상태에 따른 접근 제어
+
 ### 라우트 경로 상수
 
 ```typescript
@@ -598,7 +808,10 @@ export const ROUTES = {
   SIGN_IN: "/auth/sign-in",
   SIGN_UP: "/auth/sign-up",
   EMAIL_VERIFICATION: "/auth/email-verification",
+  EMAIL_CONFIRMED: "/auth/email-confirmed",
   PROFILE_COMPLETION: "/profile-completion",
+  TERMINAL: "/terminal",
+  TICKET_BOOKING: "/terminal/booking/:cityId",
 } as const;
 ```
 
@@ -616,8 +829,11 @@ export const ROUTES = {
 | `/auth/sign-in`            | SignInPage            | GuestGuard | 로그인                           |
 | `/auth/sign-up`            | SignUpPage            | GuestGuard | 회원가입                         |
 | `/auth/email-verification` | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
+| `/auth/email-confirmed`    | EmailConfirmedPage    | 없음       | 이메일 인증 완료                 |
 | `/`                        | IndexPage             | AuthGuard  | 홈 (메인)                        |
 | `/profile-completion`      | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
+| `/terminal`                | TerminalPage          | AuthGuard  | B0 비행선 터미널                 |
+| `/terminal/booking/:cityId`| TicketBookingPage     | AuthGuard  | 비행선 티켓 예매                 |
 
 ### 라우트 핸들
 
@@ -634,27 +850,55 @@ export const ROUTES = {
 
 ## 타입 정의 패턴
 
-공통 타입은 `src/types.ts`에서 관리:
+공통 타입은 `src/types.ts`에서 도메인별로 그룹화하여 관리:
 
 ```typescript
-// TanStack Query mutation 콜백 타입
-export type UseMutationCallback<TData = unknown, TError = Error> = {
-  onSuccess?: (data: TData) => void;
-  onError?: (error: TError) => void;
-};
+// ============================================================================
+// API 응답 타입
+// ============================================================================
 
-// 백엔드 API 응답 래퍼 타입
+/** 백엔드 API 성공 응답 래퍼 타입 (단일 데이터) */
 export interface DataResponse<T> {
   data: T;
 }
 
-// 도메인 타입 (백엔드 모델과 동일)
+/** 백엔드 API 리스트 응답 래퍼 타입 */
+export interface ListResponse<T> {
+  list: T[];
+  pagination: Pagination;
+}
+
+// ============================================================================
+// 사용자 관련 타입
+// ============================================================================
+
+/** 사용자 정보 (백엔드 User 모델과 동일) */
 export interface User {
   user_id: string;
   email: string | null;
+  nickname: string | null;
+  // ...
+}
+
+// ============================================================================
+// 도시 관련 타입
+// ============================================================================
+
+/** 도시 정보 (백엔드 City 모델과 동일) */
+export interface City {
+  city_id: string;
+  name: string;
   // ...
 }
 ```
+
+**규칙:**
+
+- **섹션 구분자**: `// ============================================================================` 사용
+- **도메인별 그룹화**: API 응답, 인증, 사용자, 도시, 비행선 등으로 분리
+- **JSDoc 주석**: 모든 인터페이스와 중요 필드에 설명 추가
+- **백엔드 동기화**: 도메인 타입은 백엔드 모델과 동일하게 유지
+- **네이밍**: `{도메인}` (예: `User`, `City`) 또는 `{동작}{도메인}RequestBody` (예: `UpdateUserRequestBody`)
 
 ## 테마 시스템
 
@@ -810,6 +1054,42 @@ export default function OnboardingPage() {
 }
 ```
 
+### Import 확장자
+
+```typescript
+// ❌ 잘못된 예: 확장자 생략
+import { Button } from "@/components/ui/button";
+import { useMe } from "@/hooks/queries/use-me";
+
+// ✅ 올바른 예: 확장자 명시
+import { Button } from "@/components/ui/button.tsx";
+import { useMe } from "@/hooks/queries/use-me.ts";
+```
+
+### 데이터 기본값
+
+```typescript
+// ❌ 잘못된 예: undefined 체크 없이 바로 사용
+const cities = cityListData.list;
+
+// ✅ 올바른 예: nullish coalescing으로 기본값 제공
+const cities = cityListData?.list ?? [];
+```
+
+### Query 훅 반환 타입
+
+```typescript
+// ❌ 잘못된 예: 반환 타입 생략
+export function useMe() {
+  return useQuery({ ... });
+}
+
+// ✅ 올바른 예: UseQueryResult 타입 명시
+export function useMe(): UseQueryResult<User, B0ApiError> {
+  return useQuery({ ... });
+}
+```
+
 ## 커밋 전 필수 작업
 
 **커밋하기 전에 반드시 다음 명령어를 순서대로 실행:**
@@ -883,8 +1163,18 @@ pnpm lint:fix  # 린트 오류 자동 수정
 
 ### API 함수
 
-- 파일명: `{도메인}.ts` (예: `users.ts`, `auth.ts`)
+- 파일명: `{도메인}.ts` (예: `users.ts`, `auth.ts`, `cities.ts`, `airships.ts`)
 - 함수명: `{동작}{대상}` (예: `getMe`, `updateMe`, `signUp`)
+- 조회: `get{대상}` (예: `getMe`, `getCityById`, `getActiveCities`)
+- 생성: `create{대상}` (예: `createMe`)
+- 수정: `update{대상}` (예: `updateMe`)
+- 삭제: `delete{대상}`
+
+### 도메인별 컴포넌트
+
+- 폴더명: `{도메인}/` (예: `terminal/`, `booking/`, `onboarding/`)
+- 파일명: `{도메인}-{역할}.tsx` 또는 `{역할}.tsx` (예: `terminal-header.tsx`, `city-card.tsx`)
+- 컴포넌트명: `{도메인}{역할}` 또는 `{역할}` (예: `TerminalHeader`, `CityCard`)
 
 ### 가드 컴포넌트
 
