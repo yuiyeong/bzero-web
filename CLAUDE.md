@@ -544,6 +544,41 @@ export function EmojiPicker({ value, onChange, disabled }: EmojiPickerProps) {
 - `cn()` 유틸리티로 조건부 클래스 적용
 - `disabled` prop 지원
 
+### 이미지 표시 (URL 기반)
+
+URL을 통해 이미지를 표시할 때는 반드시 `ImageWithSkeleton` 컴포넌트를 사용:
+
+```typescript
+import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
+
+// 기본 사용
+<ImageWithSkeleton
+  src={imageUrl}
+  alt="설명"
+  className="h-12 w-12 rounded-xl"
+/>
+
+// fallback 지정 (이미지 로드 실패 시 표시)
+<ImageWithSkeleton
+  src={imageUrl}
+  alt="설명"
+  className="h-12 w-12 rounded-xl"
+  fallback={<span className="text-2xl">🏙️</span>}
+/>
+```
+
+**ImageWithSkeleton 특징:**
+
+- 로딩 중: Skeleton 애니메이션 표시
+- 로딩 완료: 이미지 표시
+- 로드 실패: fallback 표시 (없으면 빈 상태)
+
+**규칙:**
+
+- URL 기반 이미지는 항상 `ImageWithSkeleton` 사용 (일반 `<img>` 태그 사용 금지)
+- `className`에 크기와 둥글기 지정
+- 로드 실패 시 대체 UI가 필요하면 `fallback` prop 사용
+
 ## 라우팅
 
 - **React Router**: `react-router` 사용 (v7+)
