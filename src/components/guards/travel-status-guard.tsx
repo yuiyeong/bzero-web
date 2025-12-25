@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
 import { useBoardingTicket } from "@/hooks/queries/use-boarding-ticket.ts";
 import GlobalLoader from "@/components/global-loader.tsx";
-import { ROUTES } from "@/lib/routes.ts";
+import { buildPath, ROUTES } from "@/lib/routes.ts";
 
 /**
  * 사용자의 여행 상태에 따라 적절한 페이지로 라우팅하는 가드 컴포넌트
@@ -25,8 +25,8 @@ export default function TravelStatusGuard() {
 
   // 1. 체크인 중인 체류가 있으면 → 게스트하우스 페이지로 리다이렉트
   if (roomStay && !isRoomStayError) {
-    const guesthousePath = ROUTES.GUESTHOUSE.replace(":guesthouseId", roomStay.guest_house_id);
-    if (location.pathname !== guesthousePath) {
+    const guesthousePath = buildPath.guesthouse(roomStay.guest_house_id);
+    if (!location.pathname.startsWith(guesthousePath)) {
       return <Navigate to={guesthousePath} replace />;
     }
   }

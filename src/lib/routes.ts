@@ -23,9 +23,33 @@ export const ROUTES = {
   /** B0 비행선 터미널 홈 */
   TERMINAL: "/terminal",
   /** 비행선 티켓 예매 */
-  TICKET_BOOKING: "/terminal/booking/:cityId",
+  TICKET_BOOKING: "/terminal/city/:cityId/booking",
   /** 비행선 탑승 중 (이동 화면) */
   BOARDING: "/boarding",
   /** 게스트하우스 */
   GUESTHOUSE: "/guesthouses/:guesthouseId",
+  /** 사랑방 */
+  LIVING_ROOM: "/guesthouses/:guesthouseId/living-room",
+  /** 라운지 */
+  LOUNGE: "/guesthouses/:guesthouseId/lounge",
+  /** 개인 숙소 */
+  PRIVATE_ROOM: "/guesthouses/:guesthouseId/private-room",
+} as const;
+
+/**
+ * 파라미터가 있는 라우트 경로 빌더
+ *
+ * ROUTES 상수의 동적 파라미터를 실제 값으로 대체하여 경로를 생성
+ */
+export const buildPath = {
+  /** 비행선 티켓 예매 경로 */
+  ticketBooking: (cityId: string) => ROUTES.TICKET_BOOKING.replace(":cityId", cityId),
+  /** 게스트하우스 경로 */
+  guesthouse: (guesthouseId: string) => ROUTES.GUESTHOUSE.replace(":guesthouseId", guesthouseId),
+  /** 사랑방 경로 */
+  livingRoom: (guesthouseId: string) => ROUTES.LIVING_ROOM.replace(":guesthouseId", guesthouseId),
+  /** 라운지 경로 */
+  lounge: (guesthouseId: string) => ROUTES.LOUNGE.replace(":guesthouseId", guesthouseId),
+  /** 개인 숙소 경로 */
+  privateRoom: (guesthouseId: string) => ROUTES.PRIVATE_ROOM.replace(":guesthouseId", guesthouseId),
 } as const;
