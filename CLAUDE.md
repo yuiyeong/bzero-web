@@ -811,29 +811,59 @@ export const ROUTES = {
   EMAIL_CONFIRMED: "/auth/email-confirmed",
   PROFILE_COMPLETION: "/profile-completion",
   TERMINAL: "/terminal",
-  TICKET_BOOKING: "/terminal/booking/:cityId",
+  TICKET_BOOKING: "/terminal/city/:cityId/booking",
+  BOARDING: "/boarding",
+  GUESTHOUSE: "/guesthouses/:guesthouseId",
+  LIVING_ROOM: "/guesthouses/:guesthouseId/living-room",
+  LOUNGE: "/guesthouses/:guesthouseId/lounge",
+  PRIVATE_ROOM: "/guesthouses/:guesthouseId/private-room",
 } as const;
+```
+
+### 동적 라우트 경로 빌더
+
+동적 파라미터가 있는 라우트는 `buildPath` 헬퍼 함수를 사용하여 경로를 생성:
+
+```typescript
+// src/lib/routes.ts
+export const buildPath = {
+  ticketBooking: (cityId: string) => ROUTES.TICKET_BOOKING.replace(":cityId", cityId),
+  guesthouse: (guesthouseId: string) => ROUTES.GUESTHOUSE.replace(":guesthouseId", guesthouseId),
+  livingRoom: (guesthouseId: string) => ROUTES.LIVING_ROOM.replace(":guesthouseId", guesthouseId),
+  lounge: (guesthouseId: string) => ROUTES.LOUNGE.replace(":guesthouseId", guesthouseId),
+  privateRoom: (guesthouseId: string) => ROUTES.PRIVATE_ROOM.replace(":guesthouseId", guesthouseId),
+} as const;
+
+// 사용 예시
+navigate(buildPath.ticketBooking(city.city_id));
+navigate(buildPath.guesthouse(roomStay.guest_house_id));
 ```
 
 **규칙:**
 
 - 모든 라우트 경로는 `ROUTES` 상수에서 관리
 - 새 라우트 추가 시 `ROUTES`에 먼저 정의
+- 동적 파라미터가 있는 라우트는 `buildPath`에 헬퍼 함수 추가
 
 ### 현재 라우트 구조
 
-| 경로                        | 페이지                | 가드       | 설명                             |
-| --------------------------- | --------------------- | ---------- | -------------------------------- |
-| `/onboarding`               | OnboardingPage        | 없음       | 온보딩 페이지                    |
-| `/auth`                     | AuthPage              | GuestGuard | 인증 시작 (로그인/회원가입 선택) |
-| `/auth/sign-in`             | SignInPage            | GuestGuard | 로그인                           |
-| `/auth/sign-up`             | SignUpPage            | GuestGuard | 회원가입                         |
-| `/auth/email-verification`  | EmailVerificationPage | GuestGuard | 이메일 인증 안내                 |
-| `/auth/email-confirmed`     | EmailConfirmedPage    | 없음       | 이메일 인증 완료                 |
-| `/`                         | IndexPage             | AuthGuard  | 홈 (메인)                        |
-| `/profile-completion`       | ProfileCompletionPage | AuthGuard  | 프로필 완성                      |
-| `/terminal`                 | TerminalPage          | AuthGuard  | B0 비행선 터미널                 |
-| `/terminal/booking/:cityId` | TicketBookingPage     | AuthGuard  | 비행선 티켓 예매                 |
+| 경로                                      | 페이지                | 가드              | 설명                             |
+| ----------------------------------------- | --------------------- | ----------------- | -------------------------------- |
+| `/onboarding`                             | OnboardingPage        | 없음              | 온보딩 페이지                    |
+| `/auth`                                   | AuthPage              | GuestGuard        | 인증 시작 (로그인/회원가입 선택) |
+| `/auth/sign-in`                           | SignInPage            | GuestGuard        | 로그인                           |
+| `/auth/sign-up`                           | SignUpPage            | GuestGuard        | 회원가입                         |
+| `/auth/email-verification`                | EmailVerificationPage | GuestGuard        | 이메일 인증 안내                 |
+| `/auth/email-confirmed`                   | EmailConfirmedPage    | 없음              | 이메일 인증 완료                 |
+| `/`                                       | IndexPage             | AuthGuard         | 홈 (메인)                        |
+| `/profile-completion`                     | ProfileCompletionPage | AuthGuard         | 프로필 완성                      |
+| `/terminal`                               | TerminalPage          | TravelStatusGuard | B0 비행선 터미널                 |
+| `/terminal/city/:cityId/booking`          | TicketBookingPage     | TravelStatusGuard | 비행선 티켓 예매                 |
+| `/boarding`                               | BoardingPage          | TravelStatusGuard | 비행선 탑승 중                   |
+| `/guesthouses/:guesthouseId`              | GuesthousePage        | TravelStatusGuard | 게스트하우스 거실                |
+| `/guesthouses/:guesthouseId/living-room`  | LivingRoomPage        | TravelStatusGuard | 사랑방                           |
+| `/guesthouses/:guesthouseId/lounge`       | LoungePage            | TravelStatusGuard | 라운지                           |
+| `/guesthouses/:guesthouseId/private-room` | PrivateRoomPage       | TravelStatusGuard | 개인 숙소                        |
 
 ### 라우트 핸들
 
@@ -916,11 +946,15 @@ export interface City {
 ### Tailwind 유틸리티 클래스
 
 ```css
-.glass          /* 글래스모피즘 효과 */
-.gradient-sunset /* 노을 그라데이션 (히어로 섹션용) */
-.gradient-bg    /* 배경 그라데이션 */
+.glass            /* 글래스모피즘 효과 */
+.gradient-sunset  /* 노을 그라데이션 (히어로 섹션용) */
+.gradient-bg      /* 배경 그라데이션 */
 .gradient-overlay /* 이미지 오버레이 그라데이션 */
+.h-screen-safe    /* 모바일 주소창 대응 뷰포트 높이 (dvh) */
+.min-h-screen-safe /* 모바일 주소창 대응 최소 뷰포트 높이 (dvh) */
 ```
+
+**참고:** `h-screen-safe`와 `min-h-screen-safe`는 모바일 브라우저의 주소창 표시/숨김에 대응하기 위해 `100dvh`를 사용합니다. 전체 화면을 차지하는 레이아웃에서는 `h-screen` 대신 `h-screen-safe`를 사용하세요.
 
 ### 다크 모드
 
@@ -964,6 +998,14 @@ navigate("/auth/sign-in");
 // ✅ 올바른 예: ROUTES 상수 사용
 navigate(ROUTES.SIGN_IN);
 <Link to={ROUTES.PROFILE_COMPLETION}>
+
+// ❌ 잘못된 예: 동적 라우트를 직접 replace
+navigate(ROUTES.TICKET_BOOKING.replace(":cityId", cityId));
+navigate(`/guesthouses/${guesthouseId}`);
+
+// ✅ 올바른 예: buildPath 헬퍼 함수 사용
+navigate(buildPath.ticketBooking(cityId));
+navigate(buildPath.guesthouse(guesthouseId));
 ```
 
 ### 에러 처리
