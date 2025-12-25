@@ -9,8 +9,8 @@ interface Props {
 
 export default function OnboardingSlide({ bgImage, bgImageAlt, children }: Props) {
   return (
-    <CarouselItem className="relative h-screen pl-0">
-      <img className="h-screen w-full object-cover" src={bgImage} alt={bgImageAlt} />
+    <CarouselItem className="h-screen-safe relative pl-0">
+      <img className="h-full w-full object-cover" src={bgImage} alt={bgImageAlt} />
       <div className="absolute inset-0 bg-black/50" />
       <div className="absolute inset-0 z-10">{children}</div>
     </CarouselItem>

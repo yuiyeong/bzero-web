@@ -200,4 +200,15 @@
   .gradient-overlay {
     background: linear-gradient(180deg, transparent 0%, oklch(0.167 0.033 285.885 / 90%) 100% /* #0F0F23 90% */);
   }
+
+  /* 모바일 브라우저 주소창 대응 뷰포트 높이 */
+  .min-h-screen-safe {
+    min-height: 100vh; /* fallback */
+    min-height: 100dvh; /* dvh 지원 브라우저 */
+  }
+
+  .h-screen-safe {
+    height: 100vh; /* fallback */
+    height: 100dvh; /* dvh 지원 브라우저 */
+  }
 }

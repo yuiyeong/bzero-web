@@ -54,7 +54,7 @@ export default function EmailVerificationPage() {
   };
 
   return (
-    <div className="flex h-full flex-col py-8">
+    <div className="flex h-full flex-col px-6 py-8">
       <div className="flex flex-1 flex-col items-center justify-center gap-8">
         <LoaderPinwheelIcon className="text-primary size-16 animate-spin" />
         <div className="flex flex-col gap-2 text-center">

@@ -16,7 +16,7 @@ interface EmailStatusMessageProps {
  */
 export function EmailStatusMessage({ icon: Icon, iconClassName, title, children }: EmailStatusMessageProps) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-8 py-8">
+    <div className="flex h-full flex-col items-center justify-center gap-8 px-6 py-8">
       <Icon className={iconClassName} />
       <div className="flex flex-col gap-2 text-center">
         <h2 className="text-xl font-bold">{title}</h2>

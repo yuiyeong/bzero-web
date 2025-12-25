@@ -72,7 +72,7 @@ export default function TicketBookingPage() {
   }
 
   return (
-    <div className="-mx-6 flex h-full flex-col px-6 py-6">
+    <div className="flex h-full flex-col px-6 py-6">
       <CityInfo city={city} gradient="from-purple-600 to-purple-400" />
       <AirshipSelector
         airships={airships}
