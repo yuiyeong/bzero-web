@@ -1,6 +1,6 @@
 import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
 import { useNavigate } from "react-router";
-import { ROUTES } from "@/lib/routes.ts";
+import { buildPath } from "@/lib/routes.ts";
 import type { Airship, City } from "@/types.ts";
 
 interface CityCardProps {
@@ -18,7 +18,7 @@ export function CityCard({ city, baseAirship }: CityCardProps) {
 
   const handleBookingClick = () => {
     if (isComingSoon) return;
-    navigate(ROUTES.TICKET_BOOKING.replace(":cityId", city.city_id), { state: { city } });
+    navigate(buildPath.ticketBooking(city.city_id), { state: { city } });
   };
 
   return (

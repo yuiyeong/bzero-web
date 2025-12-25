@@ -1,6 +1,5 @@
 import { Outlet, useMatches, useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
-import { cn } from "@/lib/utils.ts";
 
 interface RouteHandle {
   title?: string;
@@ -17,7 +16,7 @@ export default function MainLayout() {
   const handleBackClicked = () => navigate(-1);
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="h-screen-safe flex flex-col">
       {isRoot ? null : (
         <header className="relative items-center justify-between border-b-1 py-4">
           <div className="absolute inset-0 flex items-center px-4">
@@ -26,7 +25,7 @@ export default function MainLayout() {
           <div className="flex flex-1 items-center justify-center text-xl font-medium">{title}</div>
         </header>
       )}
-      <main className={cn("flex flex-1 flex-col", !isRoot && "px-6")}>
+      <main className="flex h-full w-full flex-1 flex-col">
         <Outlet />
       </main>
     </div>

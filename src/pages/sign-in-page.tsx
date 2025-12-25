@@ -54,7 +54,7 @@ export default function SignInPage() {
   };
 
   return (
-    <form className="flex h-full flex-col py-8" onSubmit={handleSubmit}>
+    <form className="flex h-full flex-col px-6 py-8" onSubmit={handleSubmit}>
       <div className="flex flex-1 flex-col gap-2">
         <Label className="text-muted-foreground">이메일</Label>
         <Input

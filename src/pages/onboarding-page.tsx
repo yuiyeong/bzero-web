@@ -34,8 +34,8 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="relative h-screen w-full">
-      <Carousel setApi={setApi} className="h-screen w-full">
+    <div className="h-screen-safe relative w-full">
+      <Carousel setApi={setApi} className="h-screen-safe w-full">
         <CarouselContent className="-ml-0">
           <OnboardingSlide00 />
           <OnboardingSlide01 />

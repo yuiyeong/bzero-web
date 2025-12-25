@@ -17,6 +17,9 @@ import AuthPage from "@/pages/auth-page.tsx";
 import EmailVerificationPage from "@/pages/email-verification-page.tsx";
 import EmailConfirmedPage from "@/pages/email-confirmed-page.tsx";
 import { ROUTES } from "@/lib/routes.ts";
+import LivingRoomPage from "@/pages/living-room-page.tsx";
+import LoungePage from "@/pages/lounge-page.tsx";
+import PrivateRoomPage from "@/pages/private-room-page.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -91,6 +94,21 @@ export const router = createBrowserRouter([
                     path: ROUTES.BOARDING,
                     element: <BoardingPage />,
                     handle: { title: "탑승중", isRoot: true },
+                  },
+                  {
+                    path: ROUTES.LIVING_ROOM,
+                    element: <LivingRoomPage />,
+                    handle: { title: "사랑방", isRoot: false },
+                  },
+                  {
+                    path: ROUTES.LOUNGE,
+                    element: <LoungePage />,
+                    handle: { title: "라운지", isRoot: false },
+                  },
+                  {
+                    path: ROUTES.PRIVATE_ROOM,
+                    element: <PrivateRoomPage />,
+                    handle: { title: "개인 숙소", isRoot: false },
                   },
                   {
                     path: ROUTES.GUESTHOUSE,

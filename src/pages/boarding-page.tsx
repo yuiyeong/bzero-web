@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { useBoardingTicket } from "@/hooks/queries/use-boarding-ticket.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import { ROUTES } from "@/lib/routes.ts";
+import GlobalLoader from "@/components/global-loader.tsx";
+import img_bg_boarding from "@/assets/images/img_bg_boarding.webp";
 
 /**
  * 비행선 탑승 중 화면
@@ -37,23 +39,17 @@ export default function BoardingPage() {
   }, [queryClient, navigate]);
 
   if (isLoading || !ticket) {
-    return (
-      <div className="flex h-full min-h-screen items-center justify-center bg-gradient-to-b from-[#3a2a5a] to-[#1a1a2e]">
-        <div className="text-zinc-400">로딩 중...</div>
-      </div>
-    );
+    return <GlobalLoader />;
   }
 
   return (
-    <div className="relative flex h-full min-h-screen flex-col items-center justify-center">
-      {/* 구름 배경 효과 */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 text-8xl opacity-10">☁️</div>
-        <div className="absolute top-48 right-8 text-6xl opacity-10">☁️</div>
-        <div className="absolute top-72 left-5 text-7xl opacity-10">☁️</div>
-        <div className="absolute right-12 bottom-48 text-5xl opacity-10">☁️</div>
-        <div className="absolute bottom-24 left-10 text-6xl opacity-10">☁️</div>
-      </div>
+    <div className="relative flex h-full flex-col items-center justify-center">
+      <img
+        className="absolute inset-0 h-full w-full object-cover"
+        src={img_bg_boarding}
+        alt="날아가는 비행선의 배경 이미지"
+      />
+      <div className="absolute inset-0 bg-black/75" />
 
       {/* 티켓 카드 */}
       <div className="relative z-10 w-full max-w-sm px-4">
@@ -67,7 +63,7 @@ export default function BoardingPage() {
       </div>
 
       {/* 하단 안내 문구 */}
-      <p className="relative z-10 mt-8 text-center text-zinc-400">비행 중..!</p>
+      <p className="relative z-10 mt-8 animate-bounce text-center text-zinc-400">비행 중..!</p>
     </div>
   );
 }
