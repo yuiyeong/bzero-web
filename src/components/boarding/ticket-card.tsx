@@ -1,5 +1,5 @@
 import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AirshipSnapshot, CitySnapshot } from "@/types.ts";
 
 interface TicketCardProps {
@@ -25,34 +25,59 @@ interface TicketCardProps {
  */
 export function TicketCard({ ticketNumber, city, airship, arrivalDatetime, onArrival }: TicketCardProps) {
   const [remainingTime, setRemainingTime] = useState<number>(0);
+  const hasArrivedRef = useRef(false);
+
+  // 도착 처리 함수 (중복 호출 방지)
+  const handleArrival = useCallback(() => {
+    if (hasArrivedRef.current) return;
+    hasArrivedRef.current = true;
+    onArrival?.();
+  }, [onArrival]);
 
   // 카운트다운 타이머
   useEffect(() => {
     const arrivalTime = new Date(arrivalDatetime).getTime();
 
-    // 초기 남은 시간 설정
-    const initialRemaining = Math.max(0, arrivalTime - Date.now());
-    setRemainingTime(initialRemaining);
-
-    // 이미 도착 시간이 지났으면 즉시 콜백 호출
-    if (initialRemaining <= 0) {
-      onArrival?.();
-      return;
-    }
-
-    const timer = setInterval(() => {
+    // 도착 시간 체크 함수
+    const checkArrival = () => {
       const now = Date.now();
       const remaining = Math.max(0, arrivalTime - now);
       setRemainingTime(remaining);
 
       if (remaining <= 0) {
+        handleArrival();
+        return true;
+      }
+      return false;
+    };
+
+    // 초기 체크 - 이미 도착 시간이 지났으면 즉시 콜백 호출
+    if (checkArrival()) {
+      return;
+    }
+
+    // 1초마다 타이머 업데이트
+    const timer = setInterval(() => {
+      if (checkArrival()) {
         clearInterval(timer);
-        onArrival?.();
       }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [arrivalDatetime, onArrival]);
+    // 백그라운드에서 돌아왔을 때 도착 시간 체크
+    // iOS Safari에서 긴 백그라운드 후 setInterval이 frozen될 수 있으므로 필요
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkArrival();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [arrivalDatetime, handleArrival]);
 
   const formattedTime = formatTime(remainingTime);
 
