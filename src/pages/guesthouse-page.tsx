@@ -10,6 +10,8 @@ import { ROUTES } from "@/lib/routes.ts";
 import { toast } from "sonner";
 import { formatCheckoutTime } from "@/lib/date-utils.ts";
 
+import img_bg_city from "@/assets/images/img_bg_city.webp";
+
 /**
  * 게스트하우스 거실 (체류 중) 화면
  *
@@ -53,28 +55,37 @@ export default function GuesthousePage() {
   }
 
   return (
-    <div className="gradient-sunset flex h-full min-h-screen flex-col pt-16 pb-8">
-      {/* 메인 콘텐츠 */}
-      <div className="flex flex-1 flex-col px-6">
-        {/* 도시 배지 */}
-        <div className="mb-16">
-          <CityBadge city={city} />
+    <div className="relative h-full w-full">
+      <img
+        className="absolute inset-0 h-full w-full object-cover"
+        src={img_bg_city}
+        alt="게스트 하우스의 도시 배경 이미지"
+      />
+      <div className="absolute inset-0 bg-black/75" />
+
+      <div className="absolute inset-0 flex flex-col pt-32 pb-16">
+        {/* 메인 콘텐츠 */}
+        <div className="flex flex-1 flex-col px-6">
+          {/* 도시 배지 */}
+          <div className="mb-16">
+            <CityBadge city={city} />
+          </div>
+
+          {/* 환영 메시지 */}
+          <p className="text-primary-300 text-center text-xl">Welcome!</p>
+          <p className="text-primary-300 text-center text-xs">
+            체크아웃: {formatCheckoutTime(roomStay.scheduled_check_out_at)}
+          </p>
+
+          {/* 공간 목록 */}
+          <SpaceList />
         </div>
 
-        {/* 환영 메시지 */}
-        <p className="text-primary-300 text-center text-xl">Welcome!</p>
-        <p className="text-primary-300 text-center text-xs">
-          체크아웃: {formatCheckoutTime(roomStay.scheduled_check_out_at)}
-        </p>
-
-        {/* 공간 목록 */}
-        <SpaceList />
+        {/* 하단 연장 버튼 */}
+        <Button variant="link" onClick={handleExtendClick}>
+          연장하기 300P
+        </Button>
       </div>
-
-      {/* 하단 연장 버튼 */}
-      <Button variant="link" onClick={handleExtendClick}>
-        연장하기 300P
-      </Button>
     </div>
   );
 }
