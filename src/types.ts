@@ -192,3 +192,79 @@ export interface RoomStay {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================================
+// ============================================================================
+// 일기(Diary) 관련 타입
+// ============================================================================
+
+/** 일기 정보 (백엔드 DiaryResponse와 동일) */
+export interface Diary {
+  diary_id: string;
+  user_id: string;
+  room_stay_id: string;
+  city_id: string;
+  guest_house_id: string;
+  title: string;
+  mood: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 일기 목록 응답 (백엔드 DiaryListResponse와 동일 - Flat structure) */
+export interface DiaryListResponse {
+  items: Diary[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+/** 일기 작성 요청 본문 */
+export interface CreateDiaryRequest {
+  title: string;
+  mood: string;
+  content: string;
+}
+
+/** 일기 수정 요청 본문 */
+export interface UpdateDiaryRequest {
+  title?: string;
+  mood?: string;
+  content?: string;
+}
+
+// ============================================================================
+// 문답지(Questionnaire) 관련 타입
+// ============================================================================
+
+/** 문답지 질문 (백엔드 CityQuestionResponse와 동일) */
+export interface CityQuestion {
+  city_question_id: string;
+  city_id: string;
+  question: string;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 문답지 답변 (백엔드 QuestionnaireResponse와 동일) */
+export interface Questionnaire {
+  questionnaire_id: string;
+  user_id: string;
+  room_stay_id: string;
+  city_question_id: string;
+  city_question: string; // 질문 내용 스냅샷
+  answer: string;
+  city_id: string;
+  guest_house_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** 문답지 답변 작성 요청 본문 */
+export interface CreateQuestionnaireRequest {
+  city_question_id: string;
+  answer: string;
+}

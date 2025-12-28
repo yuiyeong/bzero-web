@@ -34,6 +34,10 @@ export const ROUTES = {
   LOUNGE: "/guesthouses/:guesthouseId/lounge",
   /** 개인 숙소 */
   PRIVATE_ROOM: "/guesthouses/:guesthouseId/private-room",
+  /** 일기장 */
+  DIARY: "/guesthouses/:guesthouseId/private-room/diary",
+  /** 문답지 */
+  QUESTIONNAIRE: "/guesthouses/:guesthouseId/private-room/questionnaire",
 } as const;
 
 /**
@@ -52,4 +56,8 @@ export const buildPath = {
   lounge: (guesthouseId: string) => ROUTES.LOUNGE.replace(":guesthouseId", guesthouseId),
   /** 개인 숙소 경로 */
   privateRoom: (guesthouseId: string) => ROUTES.PRIVATE_ROOM.replace(":guesthouseId", guesthouseId),
+  /** 일기장 경로 */
+  diary: (guesthouseId: string) => ROUTES.DIARY.replace(":guesthouseId", guesthouseId),
+  /** 문답지 경로 */
+  questionnaire: (guesthouseId: string) => ROUTES.QUESTIONNAIRE.replace(":guesthouseId", guesthouseId),
 } as const;
