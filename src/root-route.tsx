@@ -20,6 +20,8 @@ import { ROUTES } from "@/lib/routes.ts";
 import LivingRoomPage from "@/pages/living-room-page.tsx";
 import LoungePage from "@/pages/lounge-page.tsx";
 import PrivateRoomPage from "@/pages/private-room-page.tsx";
+import DiaryPage from "@/pages/diary-page.tsx";
+import QuestionnairePage from "@/pages/questionnaire-page.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -109,6 +111,16 @@ export const router = createBrowserRouter([
                     path: ROUTES.PRIVATE_ROOM,
                     element: <PrivateRoomPage />,
                     handle: { title: "개인 숙소", isRoot: false },
+                  },
+                  {
+                    path: ROUTES.DIARY,
+                    element: <DiaryPage />,
+                    handle: { title: "일기장", isRoot: false },
+                  },
+                  {
+                    path: ROUTES.QUESTIONNAIRE,
+                    element: <QuestionnairePage />,
+                    handle: { title: "문답지", isRoot: false },
                   },
                   {
                     path: ROUTES.GUESTHOUSE,
