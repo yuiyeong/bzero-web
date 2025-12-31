@@ -415,9 +415,13 @@
 
 ### API 연동
 
-- [ ] 체류 연장 API 호출
-- [ ] 체크아웃 시간 조회
-- [ ] 자동 체크아웃 감지 (폴링 또는 WebSocket)
+- [ ] POST /api/v1/room-stays/current/extend - 체류 연장
+- [ ] GET /api/v1/room-stays/current - 현재 체류 정보 조회 (scheduled_checkout_at 포함)
+- [ ] 자동 체크아웃 감지:
+  - [ ] 주기적 폴링 (30초~1분 간격) 또는 Socket.IO 이벤트
+  - [ ] 백엔드 배치 작업은 10분 주기로 실행되므로, 최대 10분 지연 가능
+- [ ] GET /api/v1/notifications - 알림 목록 조회
+- [ ] PATCH /api/v1/notifications/{id}/read - 알림 읽음 처리
 
 ### 완료 조건
 
