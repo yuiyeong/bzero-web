@@ -1,15 +1,7 @@
 /**
  * 채팅 관련 REST API 함수
  */
-import type {
-  ChatMessage,
-  ChatMessagePage,
-  ChatMessageSender,
-  ConversationCard,
-  DataResponse,
-  ListResponse,
-  User,
-} from "@/types.ts";
+import type { ChatMessage, ChatMessagePage, ChatMessageSender, ConversationCard, ListResponse, User } from "@/types.ts";
 import apiClient from "@/lib/api-client.ts";
 import type { InfiniteData } from "@tanstack/react-query";
 
@@ -71,10 +63,8 @@ export async function getRoomMembers(roomId: string): Promise<ListResponse<User>
  * console.log(card.question); // "오늘 가장 감사한 일은?"
  * ```
  */
-export async function getRandomConversationCard(cityId: string): Promise<DataResponse<ConversationCard>> {
-  const { data } = await apiClient.get<DataResponse<ConversationCard>>(
-    `/chat/cities/${cityId}/conversation-cards/random`
-  );
+export async function getRandomConversationCard(cityId: string): Promise<ConversationCard> {
+  const { data } = await apiClient.get<ConversationCard>(`/chat/cities/${cityId}/conversation-cards/random`);
   return data;
 }
 

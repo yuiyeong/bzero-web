@@ -4,10 +4,8 @@
 import { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { getRandomConversationCard } from "@/api/chat.ts";
-import type { ConversationCard } from "@/types.ts";
+import { useRandomConversationCard } from "@/hooks/queries/use-random-conversation-card.ts";
 import { Loader2, RefreshCw, Share2 } from "lucide-react";
-import { logger } from "@/lib/logger.ts";
 
 interface CardModalProps {
   /** 모달 열림 상태 */
@@ -28,51 +26,22 @@ interface CardModalProps {
  * - 카드 공유
  */
 export function CardModal({ open, onOpenChange, cityId, onShare }: CardModalProps) {
-  const [card, setCard] = useState<ConversationCard | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // TanStack Query로 카드 조회 (모달 열릴 때만 활성화)
+  const { data: card, isLoading, isError, refetch, isFetching } = useRandomConversationCard(cityId, { enabled: open });
 
   // --------------------------------------------------------
-  // 카드 뽑기
+  // 다시 뽑기
   // --------------------------------------------------------
-  const drawCard = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getRandomConversationCard(cityId);
-      setCard(response.data);
-    } catch (err) {
-      logger.error("카드 뽑기 실패:", err);
-      setError("카드를 불러오는데 실패했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [cityId]);
-
-  // --------------------------------------------------------
-  // 모달 열릴 때 자동으로 카드 뽑기
-  // --------------------------------------------------------
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      if (isOpen && !card) {
-        drawCard();
-      }
-      if (!isOpen) {
-        // 모달 닫을 때 상태 초기화
-        setCard(null);
-        setError(null);
-      }
-      onOpenChange(isOpen);
-    },
-    [card, drawCard, onOpenChange]
-  );
+  const handleDrawCard = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   // --------------------------------------------------------
   // 카드 공유
   // --------------------------------------------------------
-  const handleShare = useCallback(async () => {
+  const handleShare = useCallback(() => {
     if (!card) return;
 
     setIsSharing(true);
@@ -84,8 +53,11 @@ export function CardModal({ open, onOpenChange, cityId, onShare }: CardModalProp
     }
   }, [card, onShare, onOpenChange]);
 
+  // 로딩 중 여부 (초기 로딩 또는 다시 뽑기)
+  const showLoading = isLoading || isFetching;
+
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-b0-deep-navy border-zinc-800 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-white">
@@ -96,25 +68,30 @@ export function CardModal({ open, onOpenChange, cityId, onShare }: CardModalProp
 
         <div className="py-4">
           {/* 로딩 상태 */}
-          {isLoading && (
+          {showLoading && (
             <div className="flex h-40 items-center justify-center">
               <Loader2 className="text-b0-purple h-8 w-8 animate-spin" />
             </div>
           )}
 
           {/* 에러 상태 */}
-          {error && (
+          {isError && !showLoading && (
             <div className="flex h-40 flex-col items-center justify-center gap-3">
-              <p className="text-sm text-red-400">{error}</p>
-              <Button variant="outline" size="sm" onClick={drawCard} className="border-zinc-700">
+              <p className="text-sm text-red-400">카드를 불러오는데 실패했습니다.</p>
+              <Button variant="outline" size="sm" onClick={handleDrawCard} className="border-zinc-700">
                 다시 시도
               </Button>
             </div>
           )}
 
           {/* 카드 표시 */}
-          {!isLoading && !error && card && (
+          {!showLoading && !isError && card && (
             <div className="space-y-6">
+              {/* 카드 카테고리 */}
+              <div className="text-center">
+                <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs text-zinc-400">{card.category}</span>
+              </div>
+
               {/* 카드 내용 */}
               <div className="border-b0-purple/30 from-b0-purple/10 rounded-xl border bg-gradient-to-br to-transparent p-6">
                 <p className="text-center text-lg leading-relaxed font-medium text-white">{card.question}</p>
@@ -125,8 +102,8 @@ export function CardModal({ open, onOpenChange, cityId, onShare }: CardModalProp
                 {/* 다시 뽑기 */}
                 <Button
                   variant="outline"
-                  onClick={drawCard}
-                  disabled={isLoading}
+                  onClick={handleDrawCard}
+                  disabled={isFetching}
                   className="flex-1 border-zinc-700 hover:bg-zinc-800"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />

@@ -312,9 +312,12 @@ export type RoomMember = Pick<User, "user_id" | "nickname" | "profile_emoji">;
 /** 대화 카드 */
 export interface ConversationCard {
   card_id: string;
-  city_id: string;
+  city_id: string | null;
   question: string;
+  category: string;
+  is_active: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 /** Socket.IO 연결 상태 */
