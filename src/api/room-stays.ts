@@ -14,3 +14,19 @@ export async function getCurrentRoomStay(): Promise<RoomStay> {
   const { data } = await apiClient.get<DataResponse<RoomStay>>("/room-stays/current");
   return data.data;
 }
+
+/**
+ * 현재 체류를 체크아웃합니다.
+ */
+export async function checkoutCurrentStay(): Promise<RoomStay> {
+  const { data } = await apiClient.post<DataResponse<RoomStay>>("/room-stays/current/checkout");
+  return data.data;
+}
+
+/**
+ * 현재 체류를 연장합니다. (300포인트 차감, 24시간 연장)
+ */
+export async function extendCurrentStay(): Promise<RoomStay> {
+  const { data } = await apiClient.post<DataResponse<RoomStay>>("/room-stays/current/extend");
+  return data.data;
+}
