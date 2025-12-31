@@ -25,7 +25,7 @@ export default function MainLayout() {
           <div className="flex flex-1 items-center justify-center text-xl font-medium">{title}</div>
         </header>
       )}
-      <main className="flex h-full w-full flex-1 flex-col">
+      <main className="flex min-h-0 w-full flex-1 flex-col overflow-auto">
         <Outlet />
       </main>
     </div>

@@ -2,6 +2,7 @@ import { CheckCircle2Icon, LoaderCircleIcon, XCircleIcon } from "lucide-react";
 import { EmailStatusMessage } from "@/components/email-status-message.tsx";
 import { useEffect, useState } from "react";
 import supabase from "@/lib/supabase.ts";
+import { logger } from "@/lib/logger.ts";
 
 /**
  * 이메일 인증 완료 페이지
@@ -29,7 +30,7 @@ export default function EmailConfirmedPage() {
           setStatus("error");
         }
       } catch (error) {
-        console.error("세션 확인 중 오류:", error);
+        logger.error("세션 확인 중 오류:", error);
         setStatus("error");
       }
     };

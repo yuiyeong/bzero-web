@@ -31,3 +31,37 @@ export function formatCheckoutTime(datetime: string): string {
   const day = checkout.getDate();
   return `${month}/${day} ${time}`;
 }
+
+/**
+ * 채팅 메시지 시간 포맷팅
+ *
+ * @param dateString - ISO 8601 형식 날짜 문자열
+ * @returns 포맷된 시간 문자열
+ *   - 오늘: "오전 10:30"
+ *   - 어제: "어제 오후 3:45"
+ *   - 그 외: "12월 25일 오전 9:00"
+ */
+export function formatMessageTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+
+  const timeStr = date.toLocaleTimeString("ko-KR", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  if (date >= today) {
+    return timeStr;
+  } else if (date >= yesterday) {
+    return `어제 ${timeStr}`;
+  } else {
+    const dateStr = date.toLocaleDateString("ko-KR", {
+      month: "long",
+      day: "numeric",
+    });
+    return `${dateStr} ${timeStr}`;
+  }
+}

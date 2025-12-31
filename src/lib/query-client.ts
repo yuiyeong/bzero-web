@@ -31,6 +31,12 @@ export const queryKeys = {
     cityQuestions: (cityId: string) => ["questionnaires", "cityQuestions", cityId],
     list: ["questionnaires", "list"],
   },
+  chat: {
+    all: ["chat"],
+    messages: (roomId: string) => ["chat", "messages", roomId],
+    members: (roomId: string) => ["chat", "members", roomId],
+    card: (cityId: string) => ["chat", "card", cityId],
+  },
 } as const;
 
 export const queryClient = new QueryClient();
