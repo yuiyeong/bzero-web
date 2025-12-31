@@ -3,6 +3,7 @@ import { updateMe } from "@/api/users.ts";
 import type { UseMutationCallback, User } from "@/types.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
+import { logger } from "@/lib/logger.ts";
 
 /**
  * 사용자 정보 업데이트 mutation 훅
@@ -20,7 +21,7 @@ export function useUpdateMe(callback?: UseMutationCallback<User, B0ApiError>) {
       callback?.onSuccess?.(data);
     },
     onError: (error: B0ApiError) => {
-      console.error(error);
+      logger.error(error);
       callback?.onError?.(error);
     },
   });

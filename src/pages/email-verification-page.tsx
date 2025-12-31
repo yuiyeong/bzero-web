@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router";
 import supabase from "@/lib/supabase.ts";
 import { toast } from "sonner";
 import { ROUTES } from "@/lib/routes.ts";
+import { logger } from "@/lib/logger.ts";
 
 export default function EmailVerificationPage() {
   const [isChecking, setIsChecking] = useState(false);
@@ -46,7 +47,7 @@ export default function EmailVerificationPage() {
         navigate(ROUTES.HOME, { replace: true });
       }
     } catch (error) {
-      console.error("인증 확인 중 오류 발생:", error);
+      logger.error("인증 확인 중 오류 발생:", error);
       toast.error("인증 확인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsChecking(false);

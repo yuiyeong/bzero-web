@@ -3,6 +3,7 @@ import { purchaseTicket } from "@/api/tickets.ts";
 import type { UseMutationCallback, Ticket } from "@/types.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
+import { logger } from "@/lib/logger.ts";
 
 /**
  * 비행선 티켓 구매 mutation 훅
@@ -22,7 +23,7 @@ export function usePurchaseTicket(callback?: UseMutationCallback<Ticket, B0ApiEr
       callback?.onSuccess?.(data);
     },
     onError: (error: B0ApiError) => {
-      console.error(error);
+      logger.error(error);
       callback?.onError?.(error);
     },
   });

@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { signInWithPassword } from "@/api/auth.ts";
 import type { UseMutationCallback } from "@/types.ts";
 import type { AuthError, AuthResponse } from "@supabase/supabase-js";
+import { logger } from "@/lib/logger.ts";
 
 /**
  * 이메일/비밀번호 로그인 mutation 훅
@@ -14,7 +15,7 @@ export function useSignInWithPassword(callbacks?: UseMutationCallback<AuthRespon
     mutationFn: signInWithPassword,
     onSuccess: (data: AuthResponse["data"]) => callbacks?.onSuccess?.(data),
     onError: (error: AuthError) => {
-      console.error(error);
+      logger.error(error);
       callbacks?.onError?.(error);
     },
   });

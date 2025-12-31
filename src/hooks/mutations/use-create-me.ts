@@ -3,6 +3,7 @@ import type { UseMutationCallback, User } from "@/types.ts";
 import { createMe } from "@/api/users.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
+import { logger } from "@/lib/logger.ts";
 
 /**
  * 백엔드에 새 사용자 생성 mutation 훅
@@ -21,7 +22,7 @@ export function useCreateMe(callback?: UseMutationCallback<User, B0ApiError>) {
       callback?.onSuccess?.(data);
     },
     onError: (error: B0ApiError) => {
-      console.error(error);
+      logger.error(error);
       callback?.onError?.(error);
     },
   });
