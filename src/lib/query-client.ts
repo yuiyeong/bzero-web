@@ -39,4 +39,12 @@ export const queryKeys = {
   },
 } as const;
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // 탭 전환 시 자동 재요청 방지 (소켓 연결 유지 위함)
+      staleTime: 1000 * 60, // 1분간 데이터 유효 (불필요한 로딩 상태 방지)
+      retry: false,
+    },
+  },
+});

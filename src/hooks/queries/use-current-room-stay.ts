@@ -15,5 +15,6 @@ export function useCurrentRoomStay(): UseQueryResult<RoomStay, B0ApiError> {
     queryKey: queryKeys.roomStays.current,
     queryFn: getCurrentRoomStay,
     retry: false,
+    refetchOnWindowFocus: false, // 탭 전환 시 불필요한 API 호출 및 리렌더링(언마운트) 방지
   });
 }

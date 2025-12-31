@@ -15,5 +15,6 @@ export function useMe(): UseQueryResult<User, B0ApiError> {
     queryKey: queryKeys.me.detail,
     queryFn: getMe,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 }
