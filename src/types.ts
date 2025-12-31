@@ -194,7 +194,6 @@ export interface RoomStay {
 }
 
 // ============================================================================
-// ============================================================================
 // 일기(Diary) 관련 타입
 // ============================================================================
 
@@ -267,4 +266,72 @@ export interface Questionnaire {
 export interface CreateQuestionnaireRequest {
   city_question_id: string;
   answer: string;
+}
+
+/** 채팅 메시지 타입 */
+export type ChatMessageType = "text" | "card_shared" | "system";
+
+/** 채팅 메시지 (백엔드 ChatMessageResponse와 동일) */
+export interface ChatMessage {
+  /** 메시지 고유 ID */
+  message_id: string;
+  /** 룸 ID */
+  room_id: string;
+  /** 발신자 ID (시스템 메시지는 null) */
+  user_id: string | null;
+  /** 메시지 내용 */
+  content: string;
+  /** 카드 공유 시 카드 ID */
+  card_id: string | null;
+  /** 메시지 타입 */
+  message_type: ChatMessageType;
+  /** 시스템 메시지 여부 */
+  is_system: boolean;
+  /** 생성 시간 */
+  created_at: string;
+  /** 발신자 정보 (프론트엔드에서 조인) */
+  sender?: ChatMessageSender;
+}
+
+/** 메시지 발신자 정보 (User에서 필요한 필드만 추출) */
+export interface ChatMessageSender {
+  user_id: string;
+  nickname: string | null;
+  profile_emoji: string | null;
+}
+
+/**
+ * 룸 멤버 정보
+ *
+ * 실제 API 응답은 UserResponse (User 타입)를 반환하므로,
+ * 멤버 목록에는 User 타입을 재사용합니다.
+ * 이 타입은 sender 조인 시 필요한 필드를 명시하기 위해 별도로 정의합니다.
+ */
+export type RoomMember = Pick<User, "user_id" | "nickname" | "profile_emoji">;
+
+/** 대화 카드 */
+export interface ConversationCard {
+  card_id: string;
+  city_id: string;
+  question: string;
+  created_at: string;
+}
+
+/** Socket.IO 연결 상태 */
+export type SocketConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
+
+/** Socket.IO 에러 */
+export interface SocketError {
+  code: string;
+  message: string;
+}
+
+// ============================================================================
+// 채팅 페이지네이션 타입
+// ============================================================================
+
+/** useInfiniteQuery 페이지 데이터 */
+export interface ChatMessagePage {
+  messages: ChatMessage[];
+  nextCursor: string | undefined;
 }
