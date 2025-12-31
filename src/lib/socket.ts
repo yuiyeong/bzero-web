@@ -37,11 +37,31 @@ export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 // ============================================================================
 
 /**
- * Socket.IO 서버 URL (origin만 사용)
+ * Socket.IO 서버 URL
  *
- * 백엔드 FastAPI 서버의 Socket.IO는 /ws/socket.io 경로에 마운트됨
+ * VITE_SOCKET_URL이 있으면 우선 사용하고,
+ * 없으면 VITE_API_BASE_URL에서 origin만 추출하여 사용 (경로 제외)
  */
-const SOCKET_URL: string = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_BASE_URL;
+const getSocketUrl = (): string => {
+  const socketUrl = import.meta.env.VITE_SOCKET_URL;
+  if (socketUrl) {
+    return socketUrl;
+  }
+
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  if (apiUrl) {
+    try {
+      const url = new URL(apiUrl);
+      return url.origin;
+    } catch (e) {
+      console.error("Invalid VITE_API_BASE_URL:", e);
+    }
+  }
+
+  return window.location.origin;
+};
+
+const SOCKET_URL: string = getSocketUrl();
 
 /** Socket.IO 연결 옵션 */
 const SOCKET_OPTIONS = {

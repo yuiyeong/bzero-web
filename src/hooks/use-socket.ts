@@ -101,6 +101,7 @@ export function useSocket({ roomId, enabled = true }: UseSocketOptions): UseSock
         if (!isActive) return;
 
         logger.warn("[Socket] 연결 해제:", reason);
+
         actionsRef.current.setConnectionStatus("disconnected");
 
         if (reason === "io server disconnect") {
@@ -119,7 +120,14 @@ export function useSocket({ roomId, enabled = true }: UseSocketOptions): UseSock
         });
 
         const description = (error as { description?: string }).description;
-        const errorMessage = description || error.message || "서버에 연결할 수 없습니다.";
+        // error.message가 객체일 경우를 대비해 문자열로 변환하거나 안전한 기본값 사용
+        const rawMessage = description || error.message;
+        const errorMessage =
+          typeof rawMessage === "string"
+            ? rawMessage
+            : typeof rawMessage === "object"
+              ? JSON.stringify(rawMessage)
+              : "서버에 연결할 수 없습니다.";
 
         actionsRef.current.setError({
           code: "CONNECTION_ERROR",
@@ -166,7 +174,27 @@ export function useSocket({ roomId, enabled = true }: UseSocketOptions): UseSock
         if (!isActive) return;
 
         logger.error("[Socket] 에러:", error);
-        actionsRef.current.setError(error);
+
+        // Error 객체이거나 message 속성이 있는 경우
+        let message = "알 수 없는 소켓 에러가 발생했습니다.";
+
+        if (error instanceof Error) {
+          message = error.message;
+        } else if (typeof error === "string") {
+          message = error;
+        } else if (typeof error === "object" && error !== null) {
+          const msg = (error as { message?: unknown }).message;
+          if (typeof msg === "string") {
+            message = msg;
+          } else if (msg) {
+            message = JSON.stringify(msg);
+          }
+        }
+
+        actionsRef.current.setError({
+          code: "SOCKET_ERROR",
+          message,
+        });
       });
 
       // 연결 시작

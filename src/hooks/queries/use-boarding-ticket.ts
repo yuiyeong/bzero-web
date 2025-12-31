@@ -25,5 +25,6 @@ export function useBoardingTicket(): UseQueryResult<Ticket | null, B0ApiError> {
       }
     },
     retry: false,
+    refetchOnWindowFocus: false, // 탭 전환 시 불필요한 API 호출 방지
   });
 }
