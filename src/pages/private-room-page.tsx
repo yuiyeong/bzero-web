@@ -115,34 +115,45 @@ export default function PrivateRoomPage() {
           ← 돌아가기
         </Button>
 
-        {/* 체크아웃 버튼 (AlertDialog) */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="ghost"
-              className="text-red-400 hover:bg-white/10 hover:text-red-300"
-              disabled={isCheckingOut}
-            >
-              {isCheckingOut ? "처리 중..." : "체크아웃"}
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>체크아웃 하시겠습니까?</AlertDialogTitle>
-              <AlertDialogDescription>현재 방에서 퇴실하며, 남은 시간은 저장되지 않습니다.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>취소</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleCheckout}
-                className="bg-red-500 hover:bg-red-600"
+        <div className="flex items-center gap-2">
+          {/* 연장하기 버튼 (상시 노출) */}
+          <Button
+            variant="ghost"
+            className="text-indigo-300 hover:bg-white/10 hover:text-indigo-200"
+            onClick={() => setIsExtendModalOpen(true)}
+          >
+            연장하기
+          </Button>
+
+          {/* 체크아웃 버튼 (AlertDialog) */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="text-red-400 hover:bg-white/10 hover:text-red-300"
                 disabled={isCheckingOut}
               >
-                체크아웃
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                {isCheckingOut ? "처리 중..." : "체크아웃"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>체크아웃 하시겠습니까?</AlertDialogTitle>
+                <AlertDialogDescription>현재 방에서 퇴실하며, 남은 시간은 저장되지 않습니다.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>취소</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleCheckout}
+                  className="bg-red-500 hover:bg-red-600"
+                  disabled={isCheckingOut}
+                >
+                  체크아웃
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* 임박 알림 배너 */}
