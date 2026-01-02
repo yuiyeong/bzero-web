@@ -37,7 +37,10 @@ export const ROUTES = {
   /** 일기장 */
   DIARY: "/guesthouses/:guesthouseId/private-room/diary",
   /** 문답지 */
+  /** 문답지 */
   QUESTIONNAIRE: "/guesthouses/:guesthouseId/private-room/questionnaire",
+  /** 1:1 대화방 */
+  CHAT: "/chat/:dmRoomId",
 } as const;
 
 /**
@@ -59,5 +62,8 @@ export const buildPath = {
   /** 일기장 경로 */
   diary: (guesthouseId: string) => ROUTES.DIARY.replace(":guesthouseId", guesthouseId),
   /** 문답지 경로 */
+  /** 문답지 경로 */
   questionnaire: (guesthouseId: string) => ROUTES.QUESTIONNAIRE.replace(":guesthouseId", guesthouseId),
+  /** 1:1 대화방 경로 */
+  chat: (dmRoomId: string) => ROUTES.CHAT.replace(":dmRoomId", dmRoomId),
 } as const;

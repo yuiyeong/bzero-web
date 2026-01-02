@@ -10,6 +10,9 @@ export const queryKeys = {
     active: ["cities", "active"],
     detail: (cityId: string) => ["cities", cityId],
   },
+  room: {
+    members: (roomId: string) => ["room", "members", roomId],
+  },
   airships: {
     all: ["airships"],
   },
@@ -36,6 +39,11 @@ export const queryKeys = {
     messages: (roomId: string) => ["chat", "messages", roomId],
     members: (roomId: string) => ["chat", "members", roomId],
     card: (cityId: string) => ["chat", "card", cityId],
+  },
+  dm: {
+    all: ["dm"],
+    list: (status?: string) => ["dm", "list", status],
+    messages: (dmRoomId: string) => ["dm", "messages", dmRoomId],
   },
 } as const;
 

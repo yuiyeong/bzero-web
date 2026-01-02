@@ -338,3 +338,49 @@ export interface ChatMessagePage {
   messages: ChatMessage[];
   nextCursor: string | undefined;
 }
+
+// ============================================================================
+// DM (1:1 대화) 관련 타입
+// ============================================================================
+
+export type DMStatus = "pending" | "accepted" | "active" | "rejected" | "ended";
+
+/** 1:1 메시지 (백엔드 DirectMessageResponse와 동일) */
+export interface DirectMessage {
+  dm_id: string;
+  dm_room_id: string;
+  from_user_id: string;
+  to_user_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+/** 1:1 대화방 (백엔드 DirectMessageRoomResponse와 동일) */
+export interface DirectMessageRoom {
+  dm_room_id: string;
+  guesthouse_id: string;
+  room_id: string;
+  requester_id: string;
+  receiver_id: string;
+  status: DMStatus;
+  started_at: string | null;
+  ended_at: string | null;
+  created_at: string;
+  updated_at: string;
+  last_message: DirectMessage | null;
+  unread_count: number;
+  // 파트너 정보
+  requester_nickname: string | null;
+  requester_profile_image: string | null;
+  receiver_nickname: string | null;
+  receiver_profile_image: string | null;
+  /** 대화 상대방 정보 (프론트엔드에서 조인 또는 별도 조회) */
+  partner?: User | null;
+}
+
+/** useInfiniteQuery DM 페이지 데이터 */
+export interface DirectMessagePage {
+  messages: DirectMessage[];
+  nextCursor: string | undefined;
+}
