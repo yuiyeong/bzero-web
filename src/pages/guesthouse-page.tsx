@@ -35,10 +35,11 @@ export default function GuesthousePage() {
 
   // 체류 정보가 없으면 홈으로 리다이렉트
   useEffect(() => {
-    if (isRoomStayError) {
+    // 에러가 발생했거나, 로딩이 끝났는데 데이터가 없는 경우 홈으로 이동
+    if (isRoomStayError || (!isRoomStayLoading && !roomStay)) {
       navigate(ROUTES.HOME, { replace: true });
     }
-  }, [isRoomStayError, navigate]);
+  }, [isRoomStayError, isRoomStayLoading, roomStay, navigate]);
 
   // 연장하기 버튼 핸들러
   const handleExtendClick = () => {

@@ -1,6 +1,6 @@
 import img_bg_private_room from "@/assets/images/img_bg_private_room.webp";
 import { Button } from "@/components/ui/button.tsx";
-import { buildPath } from "@/lib/routes.ts";
+import { ROUTES, buildPath } from "@/lib/routes.ts";
 import { useNavigate, useParams } from "react-router";
 import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
 import { checkoutCurrentStay } from "@/api/room-stays.ts";
@@ -32,12 +32,18 @@ export default function PrivateRoomPage() {
   const { data: roomStay, isLoading } = useCurrentRoomStay();
 
   // 체크아웃 뮤테이션
-  const { mutate: checkout, isPending: isCheckingOut } = useMutation({
+  const {
+    mutate: checkout,
+    isPending: isCheckingOut,
+    isSuccess: isCheckoutSuccess,
+  } = useMutation({
     mutationFn: checkoutCurrentStay,
     onSuccess: () => {
       toast.success("체크아웃 되었습니다.");
-      queryClient.setQueryData(queryKeys.roomStays.current, null); // 캐시 초기화
-      handleBackClick();
+      // 성공 상태(isCheckoutSuccess)로 useEffect 리다이렉트가 차단되므로,
+      // 안전하게 캐시를 초기화하고 터미널로 이동합니다.
+      queryClient.setQueryData(queryKeys.roomStays.current, null);
+      navigate(ROUTES.TERMINAL, { replace: true });
     },
     onError: (error: B0ApiError) => {
       toast.error(error.message || "체크아웃 실패");
@@ -73,9 +79,12 @@ export default function PrivateRoomPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // ... (중략) ...
+
   // 자동 리다이렉트 및 만료 감지
   useEffect(() => {
-    if (isLoading) return;
+    // 로딩 중이거나, 수동 체크아웃이 진행 중이거나 성공했을 때는 자동 리다이렉트 하지 않음
+    if (isLoading || isCheckingOut || isCheckoutSuccess) return;
 
     // 체류 정보가 없으면 로비로 이동
     if (!roomStay) {
@@ -89,7 +98,7 @@ export default function PrivateRoomPage() {
       toast.warning("퇴실 시간이 되어 자동 체크아웃 되었습니다.");
       handleBackClick();
     }
-  }, [roomStay, isLoading, now, handleBackClick]); // now가 바뀔 때마다 체크
+  }, [roomStay, isLoading, now, handleBackClick, isCheckingOut, isCheckoutSuccess]);
 
   // 남은 시간 계산 (1시간 미만 경고용)
   const getTimeRemaining = () => {
