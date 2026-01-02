@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button.tsx";
 import { CityBadge } from "@/components/guesthouse/city-badge.tsx";
 import { SpaceList } from "@/components/guesthouse/space-list.tsx";
 import GlobalLoader from "@/components/global-loader.tsx";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
 import { ROUTES } from "@/lib/routes.ts";
-import { toast } from "sonner";
+
 import { formatCheckoutTime } from "@/lib/date-utils.ts";
+import ExtendStayModal from "@/components/ExtendStayModal";
 
 import img_bg_city from "@/assets/images/img_bg_city.webp";
 
@@ -22,6 +23,7 @@ import img_bg_city from "@/assets/images/img_bg_city.webp";
  */
 export default function GuesthousePage() {
   const navigate = useNavigate();
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
 
   // 현재 체류 정보 조회
   const { data: roomStay, isLoading: isRoomStayLoading, isError: isRoomStayError } = useCurrentRoomStay();
@@ -40,7 +42,7 @@ export default function GuesthousePage() {
 
   // 연장하기 버튼 핸들러
   const handleExtendClick = () => {
-    toast.info("연장하기 기능은 준비 중입니다.");
+    setIsExtendModalOpen(true);
   };
 
   // 로딩 중
@@ -86,6 +88,12 @@ export default function GuesthousePage() {
           연장하기 300P
         </Button>
       </div>
+
+      <ExtendStayModal
+        open={isExtendModalOpen}
+        onOpenChange={setIsExtendModalOpen}
+        currentCheckOut={roomStay.scheduled_check_out_at}
+      />
     </div>
   );
 }
