@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils.ts";
 interface MessageInputProps {
   /** 메시지 전송 콜백 */
   onSend: (content: string) => void;
-  /** 카드 버튼 클릭 콜백 */
-  onCardClick: () => void;
+  /** 카드 버튼 클릭 콜백 (없으면 버튼 숨김) */
+  onCardClick?: () => void;
   /** 비활성화 여부 */
   disabled?: boolean;
 }
@@ -105,17 +105,20 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
   return (
     <form onSubmit={handleSubmit} className="bg-b0-deep-navy/95 flex items-end gap-2 border-t border-zinc-800 p-3">
       {/* 대화 카드 버튼 */}
-      <Button
-        type="button"
-        size="icon"
-        variant="ghost"
-        onClick={onCardClick}
-        disabled={disabled}
-        className="h-10 w-10 flex-shrink-0 text-xl hover:bg-zinc-800"
-        aria-label="대화 카드"
-      >
-        🎴
-      </Button>
+      {/* 대화 카드 버튼 */}
+      {onCardClick && (
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onCardClick}
+          disabled={disabled}
+          className="h-10 w-10 flex-shrink-0 text-xl hover:bg-zinc-800"
+          aria-label="대화 카드"
+        >
+          🎴
+        </Button>
+      )}
 
       {/* 입력 영역 */}
       <div className="relative flex-1">
@@ -127,7 +130,7 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
           placeholder="메시지를 입력하세요..."
           disabled={disabled}
           rows={1}
-          className="focus-visible:ring-b0-purple max-h-28 min-h-[44px] resize-none border-zinc-700 bg-zinc-800/50 pr-14 text-sm text-white placeholder:text-zinc-500"
+          className="focus-visible:ring-b0-purple max-h-28 min-h-10 resize-none border-zinc-700 bg-zinc-800/50 pr-14 text-sm text-white placeholder:text-zinc-500"
         />
 
         {/* 글자 수 카운터 */}

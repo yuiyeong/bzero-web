@@ -3,7 +3,7 @@
  */
 import { io, type Socket } from "socket.io-client";
 import { useAuthStore } from "@/stores/auth-store.ts";
-import type { ChatMessage, SocketError } from "@/types.ts";
+import type { ChatMessage, DirectMessage, SocketError } from "@/types.ts";
 
 // ============================================================================
 // 타입 정의
@@ -17,6 +17,14 @@ export interface ServerToClientEvents {
   system_message: (data: { message: ChatMessage }) => void;
   /** 에러 발생 */
   error: (error: SocketError) => void;
+
+  // --- DM Notifications ---
+  /** 대화 신청 알림 */
+  dm_request_notification: (data: { dm_room_id: string; from_user_id: string }) => void;
+  /** 대화 상태 변경 알림 (수락/거절) */
+  dm_status_changed: (data: { dm_room_id: string; status: string; updated_by: string }) => void;
+  // --- DM Messages ---
+  new_dm_message: (data: { message: DirectMessage }) => void;
 }
 
 /** Socket.IO 클라이언트 → 서버 이벤트 */
@@ -27,6 +35,9 @@ export interface ClientToServerEvents {
   send_message: (payload: { content: string }) => void;
   /** 카드 공유 */
   share_card: (payload: { card_id: string }) => void;
+  // --- DM Actions ---
+  join_dm_room: (payload: { dm_room_id: string }) => void;
+  send_dm_message: (payload: { dm_room_id: string; content: string }) => void;
 }
 
 /** 타입 안전한 Socket 인스턴스 */
@@ -106,6 +117,27 @@ export function createSocket(roomId: string): TypedSocket {
     auth: {
       token,
       room_id: roomId,
+    },
+  }) as TypedSocket;
+}
+
+/**
+ * Socket.IO DM 클라이언트 인스턴스 생성 (Namespace: /dm)
+ */
+export function createDMSocket(dmRoomId: string): TypedSocket {
+  const session = useAuthStore.getState().session;
+  const token = session?.access_token;
+
+  if (!token) {
+    throw new Error("인증 토큰이 없습니다. 로그인이 필요합니다.");
+  }
+
+  // Namespace 연결 (/dm)
+  return io(`${SOCKET_URL}/dm`, {
+    ...SOCKET_OPTIONS,
+    auth: {
+      token,
+      dm_room_id: dmRoomId,
     },
   }) as TypedSocket;
 }

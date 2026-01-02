@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { getRoomMembers } from "@/api/chat.ts";
+import { getRoomMembers } from "@/api/room.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
 import type { User } from "@/types.ts";
@@ -22,7 +22,7 @@ export function useRoomMembers(
   options?: UseRoomMembersOptions
 ): UseQueryResult<User[], B0ApiError> {
   return useQuery({
-    queryKey: queryKeys.chat.members(roomId || ""),
+    queryKey: queryKeys.room.members(roomId || ""),
     queryFn: async () => {
       const response = await getRoomMembers(roomId!);
       return response.list;

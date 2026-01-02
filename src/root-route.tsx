@@ -22,6 +22,7 @@ import LoungePage from "@/pages/lounge-page.tsx";
 import PrivateRoomPage from "@/pages/private-room-page.tsx";
 import DiaryPage from "@/pages/diary-page.tsx";
 import QuestionnairePage from "@/pages/questionnaire-page.tsx";
+import DMRoomPage from "@/pages/dm-room-page.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -136,6 +137,11 @@ export const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: ROUTES.CHAT,
+        element: <DMRoomPage />,
+        handle: { title: "1:1 대화", isRoot: false },
       },
     ],
   },
