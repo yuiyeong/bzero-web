@@ -8,6 +8,7 @@ import { generateAuthErrorMessage } from "@/lib/errors.ts";
 import { useNavigate } from "react-router";
 import type { AuthError } from "@supabase/supabase-js";
 import { ROUTES } from "@/lib/routes.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const { mutate: signUp, isPending } = useSignUp({
     onSuccess: () => {
+      trackEvent("signup_success");
       // 이메일 인증 페이지로 이메일과 비밀번호 전달
       navigate(ROUTES.EMAIL_VERIFICATION, {
         replace: true,
@@ -23,6 +25,7 @@ export default function SignUpPage() {
       });
     },
     onError: (e: AuthError) => {
+      trackEvent("signup_error", { error_code: e.code });
       toast.error(generateAuthErrorMessage(e));
     },
   });

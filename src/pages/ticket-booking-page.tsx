@@ -12,6 +12,7 @@ import { usePurchaseTicket } from "@/hooks/mutations/use-purchase-ticket.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
 import { ROUTES } from "@/lib/routes.ts";
 import type { City } from "@/types.ts";
+import { trackButtonClick, trackEvent } from "@/lib/analytics.ts";
 
 export default function TicketBookingPage() {
   const { cityId } = useParams<{ cityId: string }>();
@@ -25,10 +26,16 @@ export default function TicketBookingPage() {
   const { data: airshipsData, isLoading: isAirshipsLoading } = useAirships();
   const { mutate: purchaseTicket, isPending } = usePurchaseTicket({
     onSuccess: (ticket) => {
+      trackEvent("ticket_purchase_success", {
+        city_id: ticket.city.city_id,
+        airship_id: ticket.airship.airship_id,
+        price: ticket.cost_points,
+      });
       toast.success(`${ticket.city.name}행 티켓이 발권되었습니다.`);
       navigate(ROUTES.BOARDING, { replace: true });
     },
     onError: (error: B0ApiError) => {
+      trackEvent("ticket_purchase_error", { error_code: error.code });
       toast.error(error.message);
     },
   });
@@ -52,6 +59,7 @@ export default function TicketBookingPage() {
   const hasEnoughPoints = remainingPoints >= 0;
 
   const handleSelectAirship = (airshipId: string) => {
+    trackButtonClick("airship_select", { airship_id: airshipId });
     setSelectedAirshipId(airshipId);
   };
 

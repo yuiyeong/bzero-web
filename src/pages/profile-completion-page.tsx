@@ -8,6 +8,7 @@ import type { B0ApiError } from "@/lib/api-errors.ts";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { ROUTES } from "@/lib/routes.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 
 export default function ProfileCompletionPage() {
   const [nickname, setNickname] = useState("");
@@ -15,6 +16,7 @@ export default function ProfileCompletionPage() {
   const navigate = useNavigate();
   const { mutate: updateMe, isPending } = useUpdateMe({
     onSuccess: () => {
+      trackEvent("profile_complete", { emoji: selectedEmoji });
       navigate(ROUTES.HOME, { replace: true });
     },
     onError: (error: B0ApiError) => {

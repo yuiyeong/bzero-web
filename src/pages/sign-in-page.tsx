@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import type { AuthError } from "@supabase/supabase-js";
 import { ROUTES } from "@/lib/routes.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -15,9 +16,11 @@ export default function SignInPage() {
   const navigate = useNavigate();
   const { mutate: signInWithPassword, isPending } = useSignInWithPassword({
     onSuccess: () => {
+      trackEvent("signin_success");
       navigate(ROUTES.HOME, { replace: true });
     },
     onError: (e: AuthError) => {
+      trackEvent("signin_error", { error_code: e.code });
       if (e.code === "email_not_confirmed") {
         navigate(ROUTES.EMAIL_VERIFICATION, { replace: true });
       } else {

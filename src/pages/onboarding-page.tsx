@@ -6,6 +6,7 @@ import OnboardingSlide01 from "@/components/onboarding/onboarding-slide-01.tsx";
 import OnboardingSlide02 from "@/components/onboarding/onboarding-slide-02.tsx";
 import { useOnboardingMakeCompleted } from "@/stores/onboarding-store.ts";
 import { useNavigate } from "react-router";
+import { trackButtonClick, trackPageView } from "@/lib/analytics.ts";
 
 const SLIDE_COUNT = 3;
 
@@ -14,6 +15,10 @@ export default function OnboardingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const makeOnboardingCompleted = useOnboardingMakeCompleted();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackPageView("온보딩", "/onboarding");
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -29,6 +34,7 @@ export default function OnboardingPage() {
   }, [api]);
 
   const handleStartClicked = () => {
+    trackButtonClick("onboarding_start");
     makeOnboardingCompleted();
     navigate("/");
   };

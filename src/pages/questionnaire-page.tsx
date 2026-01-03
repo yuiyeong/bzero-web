@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { queryKeys } from "@/lib/query-client.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 
 export default function QuestionnairePage() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function QuestionnairePage() {
   const { mutate: submitAnswer, isPending: isSubmitting } = useMutation({
     mutationFn: createQuestionnaire,
     onSuccess: () => {
+      trackEvent("questionnaire_answer_success");
       toast.success("답변이 저장되었습니다. +5 포인트!");
       queryClient.invalidateQueries({ queryKey: queryKeys.questionnaires.list });
       handleNext();

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { useCallback, useEffect, useState } from "react";
 import ExtendStayModal from "@/components/ExtendStayModal";
+import { trackEvent } from "@/lib/analytics.ts";
 
 export default function PrivateRoomPage() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function PrivateRoomPage() {
   } = useMutation({
     mutationFn: checkoutCurrentStay,
     onSuccess: () => {
+      trackEvent("checkout_success");
       toast.success("체크아웃 되었습니다.");
       // 성공 상태(isCheckoutSuccess)로 useEffect 리다이렉트가 차단되므로,
       // 안전하게 캐시를 초기화하고 터미널로 이동합니다.

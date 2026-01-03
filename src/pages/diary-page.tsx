@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "@/lib/query-client.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 
 const MOODS = [
   { emoji: "😊", value: "happy", label: "행복" },
@@ -37,6 +38,7 @@ export default function DiaryPage() {
   const { mutate: submitDiary, isPending: isSubmitting } = useMutation({
     mutationFn: createDiary,
     onSuccess: () => {
+      trackEvent("diary_save_success");
       toast.success("일기가 저장되었습니다. +5 포인트 획득!");
       queryClient.invalidateQueries({ queryKey: queryKeys.diaries.list });
       setIsWriteMode(false);

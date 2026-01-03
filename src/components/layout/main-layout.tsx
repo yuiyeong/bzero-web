@@ -1,5 +1,7 @@
-import { Outlet, useMatches, useNavigate } from "react-router";
+import { Outlet, useLocation, useMatches, useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
+import { trackPageView } from "@/lib/analytics.ts";
 
 interface RouteHandle {
   title?: string;
@@ -7,11 +9,16 @@ interface RouteHandle {
 }
 
 export default function MainLayout() {
+  const location = useLocation();
   const matches = useMatches();
   const currentMatch = matches[matches.length - 1];
   const title = (currentMatch?.handle as RouteHandle)?.title || "B0";
   const isRoot = (currentMatch?.handle as RouteHandle)?.isRoot || false;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    trackPageView(title, location.pathname);
+  }, [location.pathname, title]);
 
   const handleBackClicked = () => navigate(-1);
 

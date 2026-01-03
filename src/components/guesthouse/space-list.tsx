@@ -6,6 +6,7 @@ import icon_lounge from "@/assets/images/icon_lounge.webp";
 import type { SpaceType } from "@/types.ts";
 import { useNavigate, useParams } from "react-router";
 import { buildPath } from "@/lib/routes.ts";
+import { trackButtonClick } from "@/lib/analytics.ts";
 
 /** 게스트하우스 내 공간 정보 */
 const SPACES = [
@@ -25,6 +26,8 @@ export function SpaceList() {
 
   const handleSpaceClick = (spaceType: SpaceType) => {
     if (!guesthouseId) return;
+
+    trackButtonClick("space_select", { space_type: spaceType });
 
     switch (spaceType) {
       case "living_room":

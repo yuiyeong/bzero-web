@@ -2,6 +2,7 @@ import { ImageWithSkeleton } from "@/components/ui/image-with-skeleton.tsx";
 import { useNavigate } from "react-router";
 import { buildPath } from "@/lib/routes.ts";
 import type { Airship, City } from "@/types.ts";
+import { trackButtonClick } from "@/lib/analytics.ts";
 
 interface CityCardProps {
   city: City;
@@ -18,6 +19,7 @@ export function CityCard({ city, baseAirship }: CityCardProps) {
 
   const handleBookingClick = () => {
     if (isComingSoon) return;
+    trackButtonClick("city_select", { city_id: city.city_id, city_name: city.name });
     navigate(buildPath.ticketBooking(city.city_id), { state: { city } });
   };
 

@@ -7,6 +7,7 @@ import MessageBubble from "@/components/lounge/MessageBubble";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import bgDM from "@/assets/images/img_bg_dm.webp";
+import { trackPageView } from "@/lib/analytics.ts";
 
 export default function DMRoomPage() {
   const navigate = useNavigate();
@@ -53,6 +54,10 @@ export default function DMRoomPage() {
   // Scroll to bottom
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastMessageId = messages.at(-1)?.dm_id;
+
+  useEffect(() => {
+    trackPageView("1:1 대화", `/dm/${dmRoomId}`);
+  }, [dmRoomId]);
 
   useEffect(() => {
     // Only scroll if near bottom or initial load?

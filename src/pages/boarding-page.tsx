@@ -7,6 +7,7 @@ import { queryKeys } from "@/lib/query-client.ts";
 import { ROUTES } from "@/lib/routes.ts";
 import GlobalLoader from "@/components/global-loader.tsx";
 import img_bg_boarding from "@/assets/images/img_bg_boarding.webp";
+import { trackEvent } from "@/lib/analytics.ts";
 
 /**
  * 비행선 탑승 중 화면
@@ -31,12 +32,16 @@ export default function BoardingPage() {
 
   // 도착 시 쿼리 캐시 무효화 후 홈으로 이동 (TravelStatusGuard가 체크인 상태 감지 후 게스트하우스로 리다이렉트)
   const handleArrival = useCallback(async () => {
+    if (ticket) {
+      trackEvent("arrival", { city_id: ticket.city.city_id });
+    }
+
     // 서버 상태 변경 반영을 위해 관련 쿼리 캐시 무효화
     await queryClient.invalidateQueries({ queryKey: queryKeys.tickets.boarding });
     await queryClient.invalidateQueries({ queryKey: queryKeys.roomStays.current });
 
     navigate(ROUTES.HOME, { replace: true });
-  }, [queryClient, navigate]);
+  }, [queryClient, navigate, ticket]);
 
   if (isLoading || !ticket) {
     return <GlobalLoader />;
