@@ -119,11 +119,7 @@ export default function PrivateRoomPage() {
       <div className="absolute inset-0 bg-black/60" />
 
       {/* 헤더 */}
-      <div className="relative z-10 flex h-14 items-center justify-between px-4">
-        <Button variant="ghost" className="text-white hover:bg-white/10" onClick={handleBackClick}>
-          ← 돌아가기
-        </Button>
-
+      <div className="relative z-10 flex h-14 items-center justify-end px-4">
         <div className="flex items-center gap-2">
           {/* 연장하기 버튼 (상시 노출) */}
           <Button

@@ -60,11 +60,7 @@ export function parseApiError(error: unknown): B0ApiError {
       const detail = error.response.data.detail;
 
       if (detail === "Insufficient points") {
-        return new B0ApiError(
-          ErrorCode.INSUFFICIENT_POINTS,
-          "포인트가 부족합니다.",
-          error.response.status ?? 400
-        );
+        return new B0ApiError(ErrorCode.INSUFFICIENT_POINTS, "포인트가 부족합니다.", error.response.status ?? 400);
       }
 
       // Fallback for other detail messages

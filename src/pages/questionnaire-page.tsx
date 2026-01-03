@@ -111,9 +111,7 @@ export default function QuestionnairePage() {
 
       {/* 헤더 */}
       <div className="relative z-10 flex h-14 items-center justify-between px-4">
-        <Button variant="ghost" className="text-white hover:bg-white/10" onClick={handleBackClick}>
-          ←
-        </Button>
+        <div />
         <div className="font-bold text-white">세렌시아 문답지</div>
         <div className="text-sm text-zinc-400">
           {currentStepIndex + 1}/{questions.length}

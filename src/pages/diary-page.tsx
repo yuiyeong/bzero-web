@@ -4,11 +4,9 @@ import img_bg_private_room from "@/assets/images/img_bg_private_room.webp";
 import GlobalLoader from "@/components/global-loader.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
-import { buildPath } from "@/lib/routes.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { queryKeys } from "@/lib/query-client.ts";
 
@@ -21,8 +19,6 @@ const MOODS = [
 ];
 
 export default function DiaryPage() {
-  const navigate = useNavigate();
-  const { guesthouseId } = useParams<{ guesthouseId: string }>();
   const queryClient = useQueryClient();
   const [isWriteMode, setIsWriteMode] = useState(false);
 
@@ -78,15 +74,6 @@ export default function DiaryPage() {
     });
   };
 
-  // RoomStay 조회 추가
-  // (실제 코드에서는 상위에서 props로 받거나 여기서 조회)
-  // ...
-
-  const handleBackClick = () => {
-    if (!guesthouseId) return;
-    navigate(buildPath.privateRoom(guesthouseId));
-  };
-
   if (isLoading || isRoomStayLoading) return <GlobalLoader />;
 
   return (
@@ -96,9 +83,7 @@ export default function DiaryPage() {
 
       {/* 헤더 */}
       <div className="relative z-10 flex h-14 items-center justify-between px-4">
-        <Button variant="ghost" className="text-white hover:bg-white/10" onClick={handleBackClick}>
-          ←
-        </Button>
+        <div />
         {/* 작성 모드일 때만 저장 버튼 표시 */}
         {!todayDiary || isWriteMode ? (
           <Button
