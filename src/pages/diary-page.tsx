@@ -65,8 +65,6 @@ export default function DiaryPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    if (!guesthouseId) return;
-
     submitDiary({
       title,
       mood,
