@@ -4,7 +4,7 @@
  * 프로덕션 환경에서는 로그를 출력하지 않음
  */
 
-const isDev = import.meta.env.DEV;
+const isDev = true;
 
 /**
  * 개발 환경에서만 console.log 출력
