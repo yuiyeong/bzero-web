@@ -130,7 +130,7 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
           placeholder="메시지를 입력하세요..."
           disabled={disabled}
           rows={1}
-          className="focus-visible:ring-b0-purple max-h-28 min-h-10 resize-none border-zinc-700 bg-zinc-800/50 pr-14 text-sm text-white placeholder:text-zinc-500"
+          className="focus-visible:ring-b0-purple max-h-28 min-h-10 resize-none border-zinc-700 bg-zinc-800/50 pr-14 text-base text-white placeholder:text-zinc-500"
         />
 
         {/* 글자 수 카운터 */}
