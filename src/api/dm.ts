@@ -21,12 +21,6 @@ export async function acceptDM(dmRoomId: string): Promise<DirectMessageRoom> {
   return response.data;
 }
 
-/** 1:1 대화 거절 */
-export async function rejectDM(dmRoomId: string): Promise<DirectMessageRoom> {
-  const response = await apiClient.post<DirectMessageRoom>(`${BASE_URL}/requests/${dmRoomId}/reject`);
-  return response.data;
-}
-
 // ============================================================================
 // Query (Fetch)
 // ============================================================================

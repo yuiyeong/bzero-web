@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
-import { acceptDM, getDMMessages, getMyDMRooms, rejectDM, requestDM } from "@/api/dm";
+import { acceptDM, getDMMessages, getMyDMRooms, requestDM } from "@/api/dm";
 import { queryKeys } from "@/lib/query-client";
 import type { B0ApiError } from "@/lib/api-errors";
 import { toast } from "sonner";
@@ -64,6 +64,7 @@ export function useRequestDM() {
   });
 }
 
+// remove useRejectDM
 export function useAcceptDM() {
   const queryClient = useQueryClient();
 
@@ -75,22 +76,13 @@ export function useAcceptDM() {
       return data;
     },
     onError: (error: B0ApiError) => {
-      toast.error(error.message || "수락 실패");
-    },
-  });
-}
-
-export function useRejectDM() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: rejectDM,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.dm.all });
-      toast.success("대화 신청을 거절했습니다.");
-    },
-    onError: (error: B0ApiError) => {
-      toast.error(error.message || "거절 실패");
+      if (error.code === "NOT_FOUND_DM_ROOM") {
+        toast.error("존재하지 않거나 만료된 대화방입니다.");
+      } else if (error.code === "FORBIDDEN_DM_ROOM_ACCESS") {
+        toast.error("접근 권한이 없습니다.");
+      } else {
+        toast.error(error.message || "수락 실패");
+      }
     },
   });
 }
