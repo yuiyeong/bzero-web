@@ -29,7 +29,7 @@ export default function DiaryPage() {
   // 오늘 작성한 일기 조회
   const { data: diaryList, isLoading } = useQuery({
     queryKey: queryKeys.diaries.list,
-    queryFn: () => getMyDiaries({ page: 1, size: 1 }),
+    queryFn: () => getMyDiaries({ page: 1, size: 1, current_stay_only: true }),
   });
 
   const todayDiary = diaryList?.items[0];
