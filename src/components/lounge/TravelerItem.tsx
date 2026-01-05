@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useAcceptDM, useRejectDM, useRequestDM } from "@/hooks/queries/use-dm";
+import { useAcceptDM, useRequestDM } from "@/hooks/queries/use-dm";
 import type { DirectMessageRoom, User } from "@/types";
 import { useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ export default function TravelerItem({ me, targetUser, dmRooms }: TravelerItemPr
   const navigate = useNavigate();
   const { mutate: requestDM, isPending: isRequesting } = useRequestDM();
   const { mutate: acceptDM, isPending: isAccepting } = useAcceptDM();
-  const { mutate: rejectDM, isPending: isRejecting } = useRejectDM();
 
   // 1. 나와 이 사람 사이의 DM 방 찾기
   const myRoom = dmRooms.find(
@@ -54,25 +53,22 @@ export default function TravelerItem({ me, targetUser, dmRooms }: TravelerItemPr
           </div>
         );
       } else {
-        // 내가 받음 -> 수락/거절
+        // 내가 받음 -> 수락만 가능 (거절 삭제)
         return (
           <div className="flex gap-2">
             <Button
               size="sm"
               className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-3 text-xs"
-              onClick={() => acceptDM(myRoom.dm_room_id)}
-              disabled={isAccepting || isRejecting}
+              onClick={() => {
+                acceptDM(myRoom.dm_room_id, {
+                  onSuccess: () => {
+                    navigate(`/chat/${myRoom.dm_room_id}`);
+                  },
+                });
+              }}
+              disabled={isAccepting}
             >
               수락
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-destructive border-destructive/30 hover:bg-destructive/10 h-8 px-3 text-xs"
-              onClick={() => rejectDM(myRoom.dm_room_id)}
-              disabled={isAccepting || isRejecting}
-            >
-              거절
             </Button>
           </div>
         );
@@ -94,6 +90,8 @@ export default function TravelerItem({ me, targetUser, dmRooms }: TravelerItemPr
 
     if (myRoom.status === "rejected") {
       // 거절됨 (재신청 불가 기간 등의 로직이 있을 수 있음)
+      // Note: 거절 기능 제거로 인해 이 상태에 도달할 일은 없으나,
+      // 기존 데이터가 있을 수 있으므로 표시 로직은 유지하거나 제거.
       return <span className="text-muted-foreground text-xs">거절됨</span>;
     }
 
