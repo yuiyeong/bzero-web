@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button.tsx";
 import { CityBadge } from "@/components/guesthouse/city-badge.tsx";
 import { SpaceList } from "@/components/guesthouse/space-list.tsx";
+import { SettingsButton } from "@/components/settings-button.tsx";
 import GlobalLoader from "@/components/global-loader.tsx";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
@@ -65,6 +66,11 @@ export default function GuesthousePage() {
         alt="게스트 하우스의 도시 배경 이미지"
       />
       <div className="absolute inset-0 bg-black/75" />
+
+      {/* 상단 설정 버튼 */}
+      <div className="absolute top-4 right-4 z-10">
+        <SettingsButton />
+      </div>
 
       <div className="absolute inset-0 flex flex-col pt-32 pb-16">
         {/* 메인 콘텐츠 */}
