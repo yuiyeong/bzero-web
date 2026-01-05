@@ -39,12 +39,15 @@ export default function PrivateRoomPage() {
     isSuccess: isCheckoutSuccess,
   } = useMutation({
     mutationFn: checkoutCurrentStay,
-    onSuccess: () => {
+    onSuccess: async () => {
+      // 성공 상태로 변경하여 useEffect 리다이렉트 차단 (isCheckoutSuccess가 true가 됨)
       trackEvent("checkout_success");
       toast.success("체크아웃 되었습니다.");
-      // 성공 상태(isCheckoutSuccess)로 useEffect 리다이렉트가 차단되므로,
-      // 안전하게 캐시를 초기화하고 터미널로 이동합니다.
-      queryClient.setQueryData(queryKeys.roomStays.current, null);
+
+      // 서버 상태 동기화
+      await queryClient.invalidateQueries({ queryKey: queryKeys.roomStays.current });
+
+      // 명시적으로 터미널로 이동 (replace로 뒤로가기 방지)
       navigate(ROUTES.TERMINAL, { replace: true });
     },
     onError: (error: B0ApiError) => {
@@ -63,9 +66,10 @@ export default function PrivateRoomPage() {
   };
 
   const handleBackClick = useCallback(() => {
-    if (!guesthouseId) return;
-    navigate(buildPath.guesthouse(guesthouseId));
-  }, [guesthouseId, navigate]);
+    // 개인 숙소에서 나가는 것은(뒤로가기/만료 등) 터미널로 이동하는 것이 가장 안전함
+    // (게스트하우스로 이동 시 체류 정보가 없으면 다시 리다이렉트 루프 가능성)
+    navigate(ROUTES.TERMINAL, { replace: true });
+  }, [navigate]);
 
   const handleCheckout = () => {
     checkout();

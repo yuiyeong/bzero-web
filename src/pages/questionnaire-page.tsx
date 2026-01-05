@@ -33,7 +33,7 @@ export default function QuestionnairePage() {
   // 3. 내 답변 내역 조회 (중복 답변 방지 및 진행률 확인)
   const { data: myAnswers, isLoading: isAnswersLoading } = useQuery({
     queryKey: queryKeys.questionnaires.list,
-    queryFn: () => getMyQuestionnaires({ page: 1, size: 100 }),
+    queryFn: () => getMyQuestionnaires({ page: 1, size: 100, current_stay_only: true }),
     enabled: !!cityId,
   });
 
