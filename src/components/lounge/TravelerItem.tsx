@@ -4,6 +4,7 @@ import { useAcceptDM, useRequestDM } from "@/hooks/queries/use-dm";
 import type { DirectMessageRoom, User } from "@/types";
 import { useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
+import { buildPath } from "@/lib/routes.ts";
 
 interface TravelerItemProps {
   me: User;
@@ -62,7 +63,7 @@ export default function TravelerItem({ me, targetUser, dmRooms }: TravelerItemPr
               onClick={() => {
                 acceptDM(myRoom.dm_room_id, {
                   onSuccess: () => {
-                    navigate(`/chat/${myRoom.dm_room_id}`);
+                    navigate(buildPath.chat(myRoom.guesthouse_id, myRoom.dm_room_id));
                   },
                 });
               }}
@@ -81,7 +82,7 @@ export default function TravelerItem({ me, targetUser, dmRooms }: TravelerItemPr
         <Button
           size="sm"
           className="bg-foreground text-background hover:bg-foreground/90 h-8 px-4 text-xs"
-          onClick={() => navigate(`/chat/${myRoom.dm_room_id}`)}
+          onClick={() => navigate(buildPath.chat(myRoom.guesthouse_id, myRoom.dm_room_id))}
         >
           대화하기
         </Button>

@@ -3,7 +3,7 @@ import { useRoomMembers } from "@/hooks/queries/use-room-members";
 import { useMyDMRooms } from "@/hooks/queries/use-dm";
 import { useMe } from "@/hooks/queries/use-me";
 import TravelerItem from "@/components/lounge/TravelerItem";
-import { Loader2 } from "lucide-react";
+import GlobalLoader from "@/components/global-loader.tsx";
 import { useLoungeSocket } from "@/hooks/use-lounge-socket";
 import bgLounge from "@/assets/images/img_bg_lounge.webp";
 
@@ -22,12 +22,8 @@ export default function LoungePage() {
   const { data: dmRoomsResponse, isLoading: isLoadingDMRooms } = useMyDMRooms();
 
   // 2. 로딩 상태
-  if (isLoadingStay || isLoadingMembers || isLoadingDMRooms || !me) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-zinc-300" />
-      </div>
-    );
+  if (isLoadingStay || isLoadingMembers || isLoadingDMRooms || !me || !roomStay) {
+    return <GlobalLoader />;
   }
 
   // 3. 필터링 (나 자신 제외)
@@ -35,18 +31,13 @@ export default function LoungePage() {
   const dmRooms = dmRoomsResponse?.list || [];
 
   return (
-    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${bgLounge})` }}>
+    <div className="relative h-full bg-cover bg-center" style={{ backgroundImage: `url(${bgLounge})` }}>
       <div className="absolute inset-0 bg-black/60" />
 
       {/* Content Wrapper */}
-      <div className="dark relative z-10">
-        {/* Status Bar Notch (Visual only) */}
-        <div className="h-safe-top" />
-
-        {/* Header */}
-
+      <div className="relative z-10 flex h-full flex-col overflow-hidden">
         {/* Content */}
-        <main className="px-4 py-6 pb-24">
+        <main className="flex-1 overflow-y-auto px-4 py-6">
           <div className="mb-4">
             <p className="text-muted-foreground text-sm">
               같은 게스트하우스 여행자

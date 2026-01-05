@@ -15,7 +15,7 @@ interface CityBadgeProps {
  */
 export function CityBadge({ city }: CityBadgeProps) {
   return (
-    <div className="mx-auto flex flex-col items-center justify-center gap-3">
+    <div className="mx-auto flex flex-col items-center justify-center gap-2">
       {/* 도시 이미지 */}
       <ImageWithSkeleton
         src={city.image_url || ""}
@@ -24,7 +24,7 @@ export function CityBadge({ city }: CityBadgeProps) {
         fallback={<span className="text-xl">🏙️</span>}
       />
       <h3 className="text-xl font-semibold">{city.name}</h3>
-      <p className="text-center text-sm">{city.description}</p>
+      <p className="px-16 text-center text-sm text-zinc-300">{city.description}</p>
     </div>
   );
 }

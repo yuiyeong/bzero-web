@@ -67,33 +67,35 @@ export default function GuesthousePage() {
       />
       <div className="absolute inset-0 bg-black/75" />
 
-      {/* 상단 설정 버튼 */}
-      <div className="absolute top-4 right-4 z-10">
-        <SettingsButton />
-      </div>
+      <div className="absolute inset-0 flex flex-col">
+        <div className="flex h-20 justify-end px-6">
+          {/* 상단 설정 버튼 */}
+          <SettingsButton />
+        </div>
 
-      <div className="absolute inset-0 flex flex-col pt-32 pb-16">
         {/* 메인 콘텐츠 */}
-        <div className="flex flex-1 flex-col px-6">
+        <div className="flex flex-1 flex-col gap-6 px-6">
           {/* 도시 배지 */}
-          <div className="mb-16">
-            <CityBadge city={city} />
-          </div>
+          <CityBadge city={city} />
 
           {/* 환영 메시지 */}
-          <p className="text-primary-300 text-center text-xl">Welcome!</p>
-          <p className="text-primary-300 text-center text-xs">
-            체크아웃: {formatCheckoutTime(roomStay.scheduled_check_out_at)}
-          </p>
+          <div>
+            <p className="text-primary-300 text-center text-xl">Welcome!</p>
+            <p className="text-primary-300 text-center text-xs">
+              체크아웃: {formatCheckoutTime(roomStay.scheduled_check_out_at)}
+            </p>
+          </div>
 
           {/* 공간 목록 */}
           <SpaceList />
         </div>
 
         {/* 하단 연장 버튼 */}
-        <Button variant="link" onClick={handleExtendClick}>
-          연장하기 300P
-        </Button>
+        <div className="flex h-16 items-center justify-center">
+          <Button variant="link" onClick={handleExtendClick}>
+            연장하기 300P
+          </Button>
+        </div>
       </div>
 
       <ExtendStayModal

@@ -42,7 +42,7 @@ export const ROUTES = {
   /** 문답지 */
   QUESTIONNAIRE: "/guesthouses/:guesthouseId/private-room/questionnaire",
   /** 1:1 대화방 */
-  CHAT: "/chat/:dmRoomId",
+  CHAT: "/guesthouses/:guesthouseId/chat/:dmRoomId",
 } as const;
 
 /**
@@ -67,5 +67,6 @@ export const buildPath = {
   /** 문답지 경로 */
   questionnaire: (guesthouseId: string) => ROUTES.QUESTIONNAIRE.replace(":guesthouseId", guesthouseId),
   /** 1:1 대화방 경로 */
-  chat: (dmRoomId: string) => ROUTES.CHAT.replace(":dmRoomId", dmRoomId),
+  chat: (guesthouseId: string, dmRoomId: string) =>
+    ROUTES.CHAT.replace(":guesthouseId", guesthouseId).replace(":dmRoomId", dmRoomId),
 } as const;

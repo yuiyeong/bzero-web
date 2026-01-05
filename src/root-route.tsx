@@ -135,6 +135,11 @@ export const router = createBrowserRouter([
                     handle: { title: "", isRoot: true },
                   },
                   {
+                    path: ROUTES.CHAT,
+                    element: <DMRoomPage />,
+                    handle: { title: "", isRoot: true },
+                  },
+                  {
                     path: "*",
                     element: <Navigate to={ROUTES.HOME} />,
                   },
@@ -143,11 +148,6 @@ export const router = createBrowserRouter([
             ],
           },
         ],
-      },
-      {
-        path: ROUTES.CHAT,
-        element: <DMRoomPage />,
-        handle: { title: "1:1 대화", isRoot: false },
       },
     ],
   },

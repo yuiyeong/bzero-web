@@ -4,7 +4,7 @@ import { useMe } from "@/hooks/queries/use-me";
 import { useDMSocket } from "@/hooks/use-dm-socket";
 import { MessageInput } from "@/components/chat/message-input";
 import MessageBubble from "@/components/lounge/MessageBubble";
-import { Loader2 } from "lucide-react";
+import GlobalLoader from "@/components/global-loader.tsx";
 import { useEffect, useRef } from "react";
 import bgDM from "@/assets/images/img_bg_dm.webp";
 import { trackPageView } from "@/lib/analytics.ts";
@@ -70,15 +70,11 @@ export default function DMRoomPage() {
   // Observer for Infinite Scroll would go here (fetchNextPage when scrolling up)
 
   if (isLoadingMessages || !me) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-zinc-300" />
-      </div>
-    );
+    return <GlobalLoader />;
   }
 
   return (
-    <div className="relative flex h-screen flex-col bg-cover bg-center" style={{ backgroundImage: `url(${bgDM})` }}>
+    <div className="relative flex h-full flex-col bg-cover bg-center" style={{ backgroundImage: `url(${bgDM})` }}>
       <div className="absolute inset-0 bg-black/50" />
 
       <div className="relative z-10 flex h-full flex-col">
