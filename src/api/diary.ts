@@ -10,7 +10,11 @@ import apiClient from "@/lib/api-client.ts";
  * @param params - 페이지네이션 파라미터 (page, size)
  * @returns 일기 목록 및 페이지네이션 정보
  */
-export async function getMyDiaries(params: { page: number; size: number }): Promise<DiaryListResponse> {
+export async function getMyDiaries(params: {
+  page: number;
+  size: number;
+  current_stay_only?: boolean;
+}): Promise<DiaryListResponse> {
   const { data } = await apiClient.get<DiaryListResponse>("/diaries", { params });
   return data;
 }
