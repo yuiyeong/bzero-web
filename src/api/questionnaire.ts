@@ -25,6 +25,7 @@ export async function getCityQuestions(cityId: string): Promise<CityQuestion[]> 
 export async function getMyQuestionnaires(params: {
   page: number;
   size: number;
+  current_stay_only?: boolean;
 }): Promise<ListResponse<Questionnaire>> {
   const { data } = await apiClient.get<ListResponse<Questionnaire>>("/questionnaires", { params });
   return data;
