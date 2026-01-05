@@ -20,6 +20,8 @@ export const ROUTES = {
   EMAIL_CONFIRMED: "/auth/email-confirmed",
   /** 프로필 완성 페이지 (닉네임, 이모지 설정) */
   PROFILE_COMPLETION: "/profile-completion",
+  /** 설정 페이지 */
+  SETTINGS: "/settings",
   /** B0 비행선 터미널 홈 */
   TERMINAL: "/terminal",
   /** 비행선 티켓 예매 */

@@ -35,7 +35,7 @@ export default function TerminalPage() {
       </div>
 
       <div className="z-10 flex h-full w-full flex-col">
-        <TerminalHeader currentPoints={user?.current_points ?? 0} />
+        <TerminalHeader myEmoji={user?.profile_emoji ?? "🌟"} currentPoints={user?.current_points ?? 0} />
 
         <TerminalTitle />
 

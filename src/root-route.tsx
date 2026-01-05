@@ -3,6 +3,7 @@ import OnboardingPage from "@/pages/onboarding-page.tsx";
 import SignInPage from "@/pages/sign-in-page.tsx";
 import SignUpPage from "@/pages/sign-up-page.tsx";
 import ProfileCompletionPage from "@/pages/profile-completion-page.tsx";
+import SettingsPage from "@/pages/settings-page.tsx";
 import IndexPage from "@/pages/index-page.tsx";
 import TerminalPage from "@/pages/terminal-page.tsx";
 import TicketBookingPage from "@/pages/ticket-booking-page.tsx";
@@ -68,11 +69,16 @@ export const router = createBrowserRouter([
           {
             element: <AuthGuard />,
             children: [
-              // TravelStatusGuard 밖: 프로필 설정
+              // TravelStatusGuard 밖: 프로필 설정, 설정
               {
                 path: ROUTES.PROFILE_COMPLETION,
                 element: <ProfileCompletionPage />,
                 handle: { title: "프로필 설정", isRoot: false },
+              },
+              {
+                path: ROUTES.SETTINGS,
+                element: <SettingsPage />,
+                handle: { title: "설정", isRoot: false },
               },
               // TravelStatusGuard 안: 여행 상태에 따라 리다이렉트
               {
