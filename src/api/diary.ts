@@ -7,12 +7,12 @@ import apiClient from "@/lib/api-client.ts";
 /**
  * 내 일기 목록 조회
  *
- * @param params - 페이지네이션 파라미터 (page, size)
+ * @param params - 페이지네이션 파라미터 (offset, limit)
  * @returns 일기 목록 및 페이지네이션 정보
  */
 export async function getMyDiaries(params: {
-  page: number;
-  size: number;
+  offset: number;
+  limit: number;
   current_stay_only?: boolean;
 }): Promise<DiaryListResponse> {
   const { data } = await apiClient.get<DiaryListResponse>("/diaries", { params });

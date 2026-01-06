@@ -41,6 +41,12 @@ export const ROUTES = {
   /** 문답지 */
   /** 문답지 */
   QUESTIONNAIRE: "/guesthouses/:guesthouseId/private-room/questionnaire",
+  /** 마이페이지 */
+  MYPAGE: "/mypage",
+  /** 마이페이지 - 일기 목록 */
+  MYPAGE_DIARIES: "/mypage/diaries",
+  /** 마이페이지 - 문답지 목록 */
+  MYPAGE_QUESTIONNAIRES: "/mypage/questionnaires",
   /** 1:1 대화방 */
   CHAT: "/guesthouses/:guesthouseId/chat/:dmRoomId",
 } as const;

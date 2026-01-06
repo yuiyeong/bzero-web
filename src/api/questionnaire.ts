@@ -20,11 +20,11 @@ export async function getCityQuestions(cityId: string): Promise<CityQuestion[]> 
 /**
  * 내 답변 목록 조회
  *
- * @param params - 페이지네이션 파라미터 (page, size)
+ * @param params - 페이지네이션 파라미터 (offset, limit)
  */
 export async function getMyQuestionnaires(params: {
-  page: number;
-  size: number;
+  offset: number;
+  limit: number;
   current_stay_only?: boolean;
 }): Promise<ListResponse<Questionnaire>> {
   const { data } = await apiClient.get<ListResponse<Questionnaire>>("/questionnaires", { params });
