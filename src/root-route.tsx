@@ -24,6 +24,9 @@ import PrivateRoomPage from "@/pages/private-room-page.tsx";
 import DiaryPage from "@/pages/diary-page.tsx";
 import QuestionnairePage from "@/pages/questionnaire-page.tsx";
 import DMRoomPage from "@/pages/dm-room-page.tsx";
+import MyPage from "@/pages/my-page.tsx";
+import MyDiariesPage from "@/pages/my-diaries-page.tsx";
+import MyQuestionnairesPage from "@/pages/my-questionnaires-page.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -79,6 +82,21 @@ export const router = createBrowserRouter([
                 path: ROUTES.SETTINGS,
                 element: <SettingsPage />,
                 handle: { title: "설정", isRoot: false },
+              },
+              {
+                path: ROUTES.MYPAGE,
+                element: <MyPage />,
+                handle: { title: "마이페이지", isRoot: false },
+              },
+              {
+                path: ROUTES.MYPAGE_DIARIES,
+                element: <MyDiariesPage />,
+                handle: { title: "나의 일기", isRoot: false },
+              },
+              {
+                path: ROUTES.MYPAGE_QUESTIONNAIRES,
+                element: <MyQuestionnairesPage />,
+                handle: { title: "나의 문답지", isRoot: false },
               },
               // TravelStatusGuard 안: 여행 상태에 따라 리다이렉트
               {
