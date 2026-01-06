@@ -4,34 +4,44 @@ interface PurchaseButtonProps {
   hasEnoughPoints: boolean;
   isPending?: boolean;
   onPurchase: () => void;
+  /** 포인트 부족 시 호출되는 콜백 (모달 열기 용도) */
+  onInsufficientPoints?: () => void;
 }
 
 /**
  * 비행선 구매 버튼 컴포넌트
  *
- * 포인트 부족 또는 요청 중일 때 비활성화
+ * 포인트 부족 시 클릭하면 모달을 열고, 충분하면 구매 진행
  */
-export function PurchaseButton({ hasEnoughPoints, isPending = false, onPurchase }: PurchaseButtonProps) {
-  const isDisabled = !hasEnoughPoints || isPending;
+export function PurchaseButton({
+  hasEnoughPoints,
+  isPending = false,
+  onPurchase,
+  onInsufficientPoints,
+}: PurchaseButtonProps) {
+  const handleClick = () => {
+    if (!hasEnoughPoints) {
+      onInsufficientPoints?.();
+      return;
+    }
+    onPurchase();
+  };
 
   return (
     <div className="mt-auto">
-      {!hasEnoughPoints && (
-        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-          포인트가 부족합니다. 일기를 쓰거나 대화에 참여해보세요.
-        </div>
-      )}
       <button
-        disabled={isDisabled}
-        onClick={onPurchase}
+        disabled={isPending}
+        onClick={handleClick}
         className={cn(
           "w-full rounded-lg py-4 text-base font-semibold transition-colors",
-          isDisabled
-            ? "cursor-not-allowed bg-zinc-700 text-zinc-400"
-            : "bg-b0-purple hover:bg-b0-light-purple text-white"
+          !hasEnoughPoints
+            ? "border border-red-500/30 bg-red-500/20 text-red-300"
+            : isPending
+              ? "cursor-not-allowed bg-zinc-700 text-zinc-400"
+              : "bg-b0-purple hover:bg-b0-light-purple text-white"
         )}
       >
-        {isPending ? "처리 중..." : "🎫 비행선 탑승하기"}
+        {isPending ? "처리 중..." : !hasEnoughPoints ? "포인트 부족" : "비행선 탑승하기"}
       </button>
     </div>
   );

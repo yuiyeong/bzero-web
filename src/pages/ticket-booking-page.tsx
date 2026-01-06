@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
-import { toast } from "sonner";
 import { CityInfo } from "@/components/booking/city-info.tsx";
 import { AirshipSelector } from "@/components/booking/airship-selector.tsx";
 import { PaymentSummary } from "@/components/booking/payment-summary.tsx";
 import { PurchaseButton } from "@/components/booking/purchase-button.tsx";
+import { InsufficientPointsModal } from "@/components/insufficient-points-modal.tsx";
+import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
 import { useAirships } from "@/hooks/queries/use-airships.ts";
@@ -15,12 +16,13 @@ import type { City } from "@/types.ts";
 import { trackButtonClick, trackEvent } from "@/lib/analytics.ts";
 
 export default function TicketBookingPage() {
+  const [selectedAirshipId, setSelectedAirshipId] = useState<string | null>(null);
+  const [isInsufficientModalOpen, setIsInsufficientModalOpen] = useState(false);
+
   const { cityId } = useParams<{ cityId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
   const cityFromState = location.state?.city as City | undefined;
-
-  const [selectedAirshipId, setSelectedAirshipId] = useState<string | null>(null);
 
   const { data: user } = useMe();
   const { data: airshipsData, isLoading: isAirshipsLoading } = useAirships();
@@ -94,7 +96,19 @@ export default function TicketBookingPage() {
         remainingPoints={remainingPoints}
         hasEnoughPoints={hasEnoughPoints}
       />
-      <PurchaseButton hasEnoughPoints={hasEnoughPoints} isPending={isPending} onPurchase={handlePurchase} />
+      <PurchaseButton
+        hasEnoughPoints={hasEnoughPoints}
+        isPending={isPending}
+        onPurchase={handlePurchase}
+        onInsufficientPoints={() => setIsInsufficientModalOpen(true)}
+      />
+
+      <InsufficientPointsModal
+        open={isInsufficientModalOpen}
+        onOpenChange={setIsInsufficientModalOpen}
+        currentBalance={user?.current_points ?? 0}
+        source="ticket_booking"
+      />
     </div>
   );
 }
