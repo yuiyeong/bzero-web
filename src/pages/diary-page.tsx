@@ -158,10 +158,11 @@ export default function DiaryPage() {
                       key={m.value}
                       type="button"
                       onClick={() => setMood(m.value)}
-                      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all ${mood === m.value
+                      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all ${
+                        mood === m.value
                           ? "scale-110 bg-white/20 ring-2 ring-indigo-400"
                           : "bg-white/5 grayscale filter hover:bg-white/10 hover:grayscale-0"
-                        }`}
+                      }`}
                       title={m.label}
                     >
                       {m.emoji}

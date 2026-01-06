@@ -2,6 +2,7 @@ import { TerminalHeader } from "@/components/terminal/terminal-header.tsx";
 import { TerminalTitle } from "@/components/terminal/terminal-title.tsx";
 import { TerminalInfo } from "@/components/terminal/terminal-info.tsx";
 import { CityList } from "@/components/terminal/city-list.tsx";
+import { ComingSoonSection } from "@/components/terminal/coming-soon-section.tsx";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useActiveCities } from "@/hooks/queries/use-active-cities.ts";
 import { useAirships } from "@/hooks/queries/use-airships.ts";
@@ -30,8 +31,12 @@ export default function TerminalPage() {
   return (
     <div className="relative flex h-full flex-col px-6">
       {/* 배경 효과 */}
-      <div className="from-b0-purple/15 absolute top-0 right-0 left-0 h-[180px] overflow-hidden bg-gradient-to-b to-transparent">
-        <div className="bg-b0-light-purple/30 absolute top-5 left-1/2 h-[120px] w-[200px] -translate-x-1/2 rounded-full blur-3xl" />
+      {/* 배경 효과 */}
+      <div className="absolute top-[44px] right-0 left-0 h-[180px] overflow-hidden bg-gradient-to-b from-[#7c3aed]/15 to-transparent">
+        <div className="absolute top-[20px] left-1/2 h-[120px] w-[200px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.3)_0%,transparent_70%)] blur-xl" />
+        <div className="absolute top-[30px] left-1/2 -translate-x-1/2 text-5xl opacity-60 drop-shadow-[0_4px_12px_rgba(124,58,237,0.4)]">
+          🎈
+        </div>
       </div>
 
       <div className="z-10 flex h-full w-full flex-col">
@@ -48,6 +53,9 @@ export default function TerminalPage() {
             isLoading={isLoading}
             isError={isError}
           />
+
+          {/* Coming Soon 도시들 */}
+          <ComingSoonSection />
         </div>
       </div>
     </div>
