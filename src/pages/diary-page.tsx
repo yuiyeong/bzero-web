@@ -29,7 +29,7 @@ export default function DiaryPage() {
   // 오늘 작성한 일기 조회
   const { data: diaryList, isLoading } = useQuery({
     queryKey: queryKeys.diaries.list,
-    queryFn: () => getMyDiaries({ page: 1, size: 1, current_stay_only: true }),
+    queryFn: () => getMyDiaries({ offset: 0, limit: 1, current_stay_only: true }),
   });
 
   const todayDiary = diaryList?.items[0];
@@ -158,11 +158,10 @@ export default function DiaryPage() {
                       key={m.value}
                       type="button"
                       onClick={() => setMood(m.value)}
-                      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all ${
-                        mood === m.value
+                      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all ${mood === m.value
                           ? "scale-110 bg-white/20 ring-2 ring-indigo-400"
                           : "bg-white/5 grayscale filter hover:bg-white/10 hover:grayscale-0"
-                      }`}
+                        }`}
                       title={m.label}
                     >
                       {m.emoji}

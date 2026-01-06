@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { getCities } from "@/api/cities.ts";
+import { getActiveCities } from "@/api/cities.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
 import type { ListResponse, City } from "@/types.ts";
@@ -20,7 +20,7 @@ export function useCities(
   includeInactive = false
 ): UseQueryResult<ListResponse<City>, B0ApiError> {
   return useQuery({
-    queryKey: queryKeys.cities.list({ offset, limit, includeInactive }),
-    queryFn: () => getCities(offset, limit, includeInactive),
+    queryKey: [...queryKeys.cities.all, { offset, limit, includeInactive }],
+    queryFn: () => getActiveCities(offset, limit),
   });
 }
