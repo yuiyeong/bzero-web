@@ -5,13 +5,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/dialog.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { InsufficientPointsModal } from "@/components/insufficient-points-modal.tsx";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { extendCurrentStay } from "@/api/room-stays";
+import { extendCurrentStay } from "@/api/room-stays.ts";
 import { toast } from "sonner";
-import { queryKeys } from "@/lib/query-client";
-import type { B0ApiError } from "@/lib/api-errors";
+import { useMe } from "@/hooks/queries/use-me.ts";
+import { queryKeys } from "@/lib/query-client.ts";
+import type { B0ApiError } from "@/lib/api-errors.ts";
 
 interface ExtendStayModalProps {
   open: boolean;
@@ -20,7 +23,10 @@ interface ExtendStayModalProps {
 }
 
 export default function ExtendStayModal({ open, onOpenChange, currentCheckOut }: ExtendStayModalProps) {
+  const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+
   const queryClient = useQueryClient();
+  const { data: user } = useMe();
 
   const { mutate: extend, isPending } = useMutation({
     mutationFn: extendCurrentStay,
@@ -31,7 +37,7 @@ export default function ExtendStayModal({ open, onOpenChange, currentCheckOut }:
     },
     onError: (error: B0ApiError) => {
       if (error.code === "INSUFFICIENT_BALANCE") {
-        toast.error("포인트가 부족합니다. (필요: 300P)");
+        setShowInsufficientModal(true);
       } else {
         toast.error(error.message || "연장 실패");
       }
@@ -50,39 +56,48 @@ export default function ExtendStayModal({ open, onOpenChange, currentCheckOut }:
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>체류 기간 연장</DialogTitle>
-          <DialogDescription>
-            체류를 1일(24시간) 연장하시겠습니까?
-            <br />
-            <span className="font-bold text-indigo-500">300 포인트</span>가 차감됩니다.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>체류 기간 연장</DialogTitle>
+            <DialogDescription>
+              체류를 1일(24시간) 연장하시겠습니까?
+              <br />
+              <span className="font-bold text-indigo-500">300 포인트</span>가 차감됩니다.
+            </DialogDescription>
+          </DialogHeader>
 
-        {currentCheckOut && (
-          <div className="grid gap-2 py-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500">현재 체크아웃 시간</span>
-              <span className="font-medium">{new Date(currentCheckOut).toLocaleString()}</span>
+          {currentCheckOut && (
+            <div className="grid gap-2 py-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-500">현재 체크아웃 시간</span>
+                <span className="font-medium">{new Date(currentCheckOut).toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-500">연장 후 체크아웃 시간</span>
+                <span className="font-bold text-indigo-500">{getNewCheckOutDate()}</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500">연장 후 체크아웃 시간</span>
-              <span className="font-bold text-indigo-500">{getNewCheckOutDate()}</span>
-            </div>
-          </div>
-        )}
+          )}
 
-        <DialogFooter className="sm:justify-end">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            취소
-          </Button>
-          <Button onClick={handleExtend} disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
-            {isPending ? "연장 중..." : "300P로 연장하기"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="sm:justify-end">
+            <Button variant="secondary" onClick={() => onOpenChange(false)}>
+              취소
+            </Button>
+            <Button onClick={handleExtend} disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
+              {isPending ? "연장 중..." : "300P로 연장하기"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <InsufficientPointsModal
+        open={showInsufficientModal}
+        onOpenChange={setShowInsufficientModal}
+        currentBalance={user?.current_points ?? 0}
+        source="extend_stay"
+      />
+    </>
   );
 }
