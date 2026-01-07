@@ -20,6 +20,7 @@ export function useMyDMRooms(status?: string) {
 export function useDMMessages(dmRoomId: string) {
   return useInfiniteQuery({
     queryKey: queryKeys.dm.messages(dmRoomId),
+    staleTime: 0, // 채팅방 재진입 시 항상 최신 메시지 fetch
     queryFn: async ({ pageParam }) => {
       const response = await getDMMessages(dmRoomId, {
         cursor: pageParam,

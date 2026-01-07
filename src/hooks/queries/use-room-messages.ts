@@ -31,6 +31,7 @@ export function useRoomMessages(
 
   return useInfiniteQuery({
     queryKey: queryKeys.chat.messages(roomId || ""),
+    staleTime: 0, // 채팅방 재진입 시 항상 최신 메시지 fetch
     queryFn: async ({ pageParam }) => {
       const response = await getRoomMessages(roomId!, pageParam, 50);
 
