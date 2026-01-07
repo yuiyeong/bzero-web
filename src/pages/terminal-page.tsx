@@ -30,14 +30,6 @@ export default function TerminalPage() {
 
   return (
     <div className="relative flex h-full flex-col px-6">
-      {/* 배경 효과 */}
-      {/* 배경 효과 */}
-      <div className="absolute top-[44px] right-0 left-0 h-[180px] overflow-hidden bg-gradient-to-b from-[#7c3aed]/15 to-transparent">
-        <div className="absolute top-[20px] left-1/2 h-[120px] w-[200px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(167,139,250,0.3)_0%,transparent_70%)] blur-xl" />
-        <div className="absolute top-[30px] left-1/2 -translate-x-1/2 text-5xl opacity-60 drop-shadow-[0_4px_12px_rgba(124,58,237,0.4)]">
-          🎈
-        </div>
-      </div>
 
       <div className="z-10 flex h-full w-full flex-col">
         <TerminalHeader myEmoji={user?.profile_emoji ?? "🌟"} currentPoints={user?.current_points ?? 0} />
