@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateMe } from "@/api/users.ts";
+import { toast } from "sonner";
 import type { UseMutationCallback, User } from "@/types.ts";
 import { queryKeys } from "@/lib/query-client.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
@@ -21,6 +22,11 @@ export function useUpdateMe(callback?: UseMutationCallback<User, B0ApiError>) {
       callback?.onSuccess?.(data);
     },
     onError: (error: B0ApiError) => {
+      if (error.code === "DUPLICATED_NICKNAME") {
+        toast.error("이미 사용 중인 닉네임입니다.");
+      } else {
+        toast.error(error.message);
+      }
       logger.error(error);
       callback?.onError?.(error);
     },
