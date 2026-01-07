@@ -30,7 +30,6 @@ export default function TerminalPage() {
 
   return (
     <div className="relative flex h-full flex-col px-6">
-
       <div className="z-10 flex h-full w-full flex-col">
         <TerminalHeader myEmoji={user?.profile_emoji ?? "🌟"} currentPoints={user?.current_points ?? 0} />
 
