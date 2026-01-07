@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from "react-router";
-import { useDMMessages, useMyDMRooms } from "@/hooks/queries/use-dm";
-import { useMe } from "@/hooks/queries/use-me";
-import { useDMSocket } from "@/hooks/use-dm-socket";
-import { MessageInput } from "@/components/chat/message-input";
-import MessageBubble from "@/components/lounge/MessageBubble";
+import { useDMMessages, useMyDMRooms } from "@/hooks/queries/use-dm.ts";
+import { useMe } from "@/hooks/queries/use-me.ts";
+import { useDMSocket } from "@/hooks/use-dm-socket.ts";
+import { useKeyboardDismiss } from "@/hooks/use-keyboard-dismiss.ts";
+import { MessageInput } from "@/components/chat/message-input.tsx";
+import MessageBubble from "@/components/lounge/MessageBubble.tsx";
 import GlobalLoader from "@/components/global-loader.tsx";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import bgDM from "@/assets/images/img_bg_dm.webp";
 import { trackPageView } from "@/lib/analytics.ts";
 
@@ -48,12 +49,28 @@ export default function DMRoomPage() {
     }
   }
 
-  // Flatten messages
-  const messages = messagesData?.pages.flatMap((p) => p.messages) || [];
+  // Flatten messages (useMemo로 감싸서 매 렌더링마다 새 배열 생성 방지)
+  const messages = useMemo(() => messagesData?.pages.flatMap((p) => p.messages) ?? [], [messagesData?.pages]);
 
   // Scroll to bottom
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastMessageId = messages.at(-1)?.dm_id;
+
+  // 모바일 키보드 처리
+  const { scheduleKeyboardDismiss, dismissKeyboardIfScheduled } = useKeyboardDismiss();
+  const lastOwnMessageRef = useRef<HTMLDivElement | null>(null);
+  const prevLastOwnMessageIdRef = useRef<string | null>(null);
+
+  // 마지막 내 메시지 찾기
+  const lastOwnMessage = useMemo(() => {
+    if (!me) return null;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].from_user_id === me.user_id) {
+        return messages[i];
+      }
+    }
+    return null;
+  }, [messages, me]);
 
   useEffect(() => {
     trackPageView("1:1 대화", `/dm/${dmRoomId}`);
@@ -63,9 +80,21 @@ export default function DMRoomPage() {
     // Only scroll if near bottom or initial load?
     // For now simple auto scroll on new message (lastMessageId change)
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      });
     }
   }, [lastMessageId]); // Trigger only when newest message changes
+
+  // 새 내 메시지 감지 시 키보드 dismiss 처리 (모바일)
+  useEffect(() => {
+    if (lastOwnMessage && lastOwnMessage.dm_id !== prevLastOwnMessageIdRef.current) {
+      prevLastOwnMessageIdRef.current = lastOwnMessage.dm_id;
+      dismissKeyboardIfScheduled(lastOwnMessageRef.current);
+    }
+  }, [lastOwnMessage, dismissKeyboardIfScheduled]);
 
   // Observer for Infinite Scroll would go here (fetchNextPage when scrolling up)
 
@@ -120,23 +149,25 @@ export default function DMRoomPage() {
           {messages.length === 0 ? (
             <div className="mt-20 text-center text-sm text-zinc-400">대화를 시작해보세요!</div>
           ) : (
-            messages.map((msg) => (
-              <MessageBubble
-                key={msg.dm_id}
-                message={msg}
-                isMe={msg.from_user_id === me.user_id}
-                // We don't have sender object in `DirectMessage` from API yet?
-                // `api/dm.ts` -> `DirectMessage` interface only has IDs.
-                // MessageBubble will try to show logic but might fail if sender undefined.
-                // Backend needs to join sender.
-              />
-            ))
+            messages.map((msg) => {
+              const isMe = msg.from_user_id === me.user_id;
+              const isLastOwnMessage = lastOwnMessage?.dm_id === msg.dm_id;
+
+              return (
+                <MessageBubble
+                  key={msg.dm_id}
+                  ref={isLastOwnMessage ? lastOwnMessageRef : undefined}
+                  message={msg}
+                  isMe={isMe}
+                />
+              );
+            })
           )}
         </div>
 
         {/* Input */}
         <div className="flex-none">
-          <MessageInput onSend={sendMessage} disabled={!isConnected} />
+          <MessageInput onSend={sendMessage} onMessageSent={scheduleKeyboardDismiss} disabled={!isConnected} />
         </div>
       </div>
     </div>

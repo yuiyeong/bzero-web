@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { DirectMessage, User } from "@/types";
@@ -9,9 +10,21 @@ interface MessageBubbleProps {
   sender?: User; // Only needed if !isMe
 }
 
-export default function MessageBubble({ message, isMe, sender }: MessageBubbleProps) {
+/**
+ * DM 메시지 버블 컴포넌트
+ *
+ * iOS Safari 키보드 처리를 위해 forwardRef + tabIndex 지원
+ */
+const MessageBubble = forwardRef<HTMLDivElement, MessageBubbleProps>(function MessageBubble(
+  { message, isMe, sender },
+  ref
+) {
   return (
-    <div className={cn("mb-4 flex w-full items-start gap-2", isMe ? "justify-end" : "justify-start")}>
+    <div
+      ref={ref}
+      tabIndex={-1}
+      className={cn("mb-4 flex w-full items-start gap-2 outline-none", isMe ? "justify-end" : "justify-start")}
+    >
       {!isMe && (
         <Avatar className="h-8 w-8">
           {sender?.profile_emoji && <AvatarImage src={`/avatars/${sender.profile_emoji}.png`} />}
@@ -33,4 +46,6 @@ export default function MessageBubble({ message, isMe, sender }: MessageBubblePr
       </div>
     </div>
   );
-}
+});
+
+export default MessageBubble;

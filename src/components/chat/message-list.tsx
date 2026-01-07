@@ -15,6 +15,8 @@ import type { ChatMessage } from "@/types.ts";
 interface MessageListProps {
   /** 룸 ID */
   roomId: string;
+  /** 마지막 내 메시지 ref 콜백 (iOS Safari 키보드 처리용) */
+  onLastOwnMessageRef?: (ref: HTMLDivElement | null) => void;
 }
 
 /**
@@ -22,8 +24,9 @@ interface MessageListProps {
  *
  * - 무한 스크롤로 이전 메시지 로드
  * - 새 메시지 수신 시 하단에 있으면 자동 스크롤
+ * - iOS Safari 키보드 처리를 위해 마지막 내 메시지 ref 콜백 지원
  */
-export function MessageList({ roomId }: MessageListProps) {
+export function MessageList({ roomId, onLastOwnMessageRef }: MessageListProps) {
   const connectionStatus = useChatConnectionStatus();
   const { data: me } = useMe();
 
@@ -50,6 +53,22 @@ export function MessageList({ roomId }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
   const prevMessagesLengthRef = useRef(0);
+
+  // iOS Safari 키보드 처리를 위한 refs
+  const lastOwnMessageRef = useRef<HTMLDivElement | null>(null);
+  const prevLastOwnMessageIdRef = useRef<string | null>(null);
+
+  // 마지막 내 메시지 찾기 (시스템 메시지 제외)
+  const lastOwnMessage = useMemo(() => {
+    if (!me) return null;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg.user_id === me.user_id && !msg.is_system && msg.message_type !== "system") {
+        return msg;
+      }
+    }
+    return null;
+  }, [messages, me]);
 
   // --------------------------------------------------------
   // 하단으로 스크롤 (iOS Safari 호환)
@@ -109,9 +128,25 @@ export function MessageList({ roomId }: MessageListProps) {
   }, [connectionStatus, messages.length, scrollToBottom]);
 
   // --------------------------------------------------------
+  // 새 내 메시지 감지 시 콜백 호출 (iOS Safari 키보드 처리)
+  // --------------------------------------------------------
+  useEffect(() => {
+    if (lastOwnMessage && lastOwnMessage.message_id !== prevLastOwnMessageIdRef.current) {
+      prevLastOwnMessageIdRef.current = lastOwnMessage.message_id;
+      // 렌더링 완료 후 콜백 호출
+      requestAnimationFrame(() => {
+        onLastOwnMessageRef?.(lastOwnMessageRef.current);
+      });
+    }
+  }, [lastOwnMessage, onLastOwnMessageRef]);
+
+  // --------------------------------------------------------
   // 메시지 렌더링
   // --------------------------------------------------------
   const renderMessage = (message: ChatMessage) => {
+    const isOwn = message.user_id === me?.user_id;
+    const isLastOwnMessage = lastOwnMessage?.message_id === message.message_id;
+
     // 시스템 메시지
     if (message.is_system || message.message_type === "system") {
       return <SystemMessage key={message.message_id} message={message} />;
@@ -119,11 +154,25 @@ export function MessageList({ roomId }: MessageListProps) {
 
     // 카드 공유 메시지
     if (message.message_type === "card_shared") {
-      return <CardMessage key={message.message_id} message={message} isOwn={message.user_id === me?.user_id} />;
+      return (
+        <CardMessage
+          key={message.message_id}
+          ref={isLastOwnMessage ? lastOwnMessageRef : undefined}
+          message={message}
+          isOwn={isOwn}
+        />
+      );
     }
 
     // 일반 텍스트 메시지
-    return <MessageBubble key={message.message_id} message={message} isOwn={message.user_id === me?.user_id} />;
+    return (
+      <MessageBubble
+        key={message.message_id}
+        ref={isLastOwnMessage ? lastOwnMessageRef : undefined}
+        message={message}
+        isOwn={isOwn}
+      />
+    );
   };
 
   return (

@@ -3,7 +3,7 @@
  *
  * MessageBubble과 CardMessage에서 공통으로 사용하는 레이아웃을 제공
  */
-import type { ReactNode } from "react";
+import { forwardRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils.ts";
 import { formatMessageTime } from "@/lib/date-utils.ts";
 import type { ChatMessage } from "@/types.ts";
@@ -22,12 +22,16 @@ interface MessageWrapperProps {
  * - 프로필 이모지 (상대방만)
  * - 닉네임 (상대방만)
  * - 시간 표시
+ * - iOS Safari 키보드 처리를 위해 forwardRef + tabIndex 지원
  */
-export function MessageWrapper({ message, isOwn, maxWidth = "max-w-[70%]", children }: MessageWrapperProps) {
+export const MessageWrapper = forwardRef<HTMLDivElement, MessageWrapperProps>(function MessageWrapper(
+  { message, isOwn, maxWidth = "max-w-[70%]", children },
+  ref
+) {
   const time = formatMessageTime(message.created_at);
 
   return (
-    <div className={cn("flex gap-2", isOwn ? "flex-row-reverse" : "flex-row")}>
+    <div ref={ref} tabIndex={-1} className={cn("flex gap-2 outline-none", isOwn ? "flex-row-reverse" : "flex-row")}>
       {/* 프로필 이모지 */}
       {!isOwn && (
         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-zinc-700 text-lg">
@@ -50,4 +54,4 @@ export function MessageWrapper({ message, isOwn, maxWidth = "max-w-[70%]", child
       </div>
     </div>
   );
-}
+});

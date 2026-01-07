@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils.ts";
 interface MessageInputProps {
   /** 메시지 전송 콜백 */
   onSend: (content: string) => void;
+  /** 메시지 전송 완료 후 콜백 (iOS Safari 키보드 처리용) */
+  onMessageSent?: () => void;
   /** 카드 버튼 클릭 콜백 (없으면 버튼 숨김) */
   onCardClick?: () => void;
   /** 비활성화 여부 */
@@ -30,7 +32,7 @@ const SEND_COOLDOWN = 2000;
  * - Enter: 전송 / Shift+Enter: 줄바꿈
  * - 대화 카드 버튼
  */
-export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProps) {
+export function MessageInput({ onSend, onMessageSent, onCardClick, disabled }: MessageInputProps) {
   const [content, setContent] = useState("");
   const [isCooldown, setIsCooldown] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -68,10 +70,11 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
         setIsCooldown(false);
       }, SEND_COOLDOWN);
 
-      // 포커스 유지
-      textareaRef.current?.focus();
+      // iOS Safari 키보드 내리기 위해 blur 처리
+      textareaRef.current?.blur();
+      onMessageSent?.();
     },
-    [content, disabled, isCooldown, onSend]
+    [content, disabled, isCooldown, onSend, onMessageSent]
   );
 
   // --------------------------------------------------------
@@ -105,7 +108,6 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
   return (
     <form onSubmit={handleSubmit} className="bg-b0-deep-navy/95 flex items-end gap-2 border-t border-zinc-800 p-3">
       {/* 대화 카드 버튼 */}
-      {/* 대화 카드 버튼 */}
       {onCardClick && (
         <Button
           type="button"
@@ -130,6 +132,7 @@ export function MessageInput({ onSend, onCardClick, disabled }: MessageInputProp
           placeholder="메시지를 입력하세요..."
           disabled={disabled}
           rows={1}
+          enterKeyHint="send"
           className="focus-visible:ring-b0-purple max-h-28 min-h-10 resize-none border-zinc-700 bg-zinc-800/50 pr-14 text-base text-white placeholder:text-zinc-500"
         />
 
