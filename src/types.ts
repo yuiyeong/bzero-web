@@ -384,3 +384,21 @@ export interface DirectMessagePage {
   messages: DirectMessage[];
   nextCursor: string | undefined;
 }
+
+// ============================================================================
+// 보상(Reward) 관련 타입
+// ============================================================================
+
+/** 일일 로그인 보상 정보 */
+export interface DailyLoginReward {
+  reward_id: string;
+  user_id: string;
+  reward_type: "daily_login";
+  /** 지급 포인트 */
+  amount: number;
+  /** 기준 날짜 (YYYY-MM-DD) */
+  reference_date: string;
+  /** 새로 지급 여부 (true: 새로 지급됨, false: 이미 받음) */
+  claimed: boolean;
+  created_at: string;
+}

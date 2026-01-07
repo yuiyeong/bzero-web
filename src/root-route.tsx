@@ -13,6 +13,7 @@ import MainLayout from "@/components/layout/main-layout.tsx";
 import OnboardingGuard from "@/components/guards/onboarding-guard.tsx";
 import GuestGuard from "@/components/guards/guest-guard.tsx";
 import AuthGuard from "@/components/guards/auth-guard.tsx";
+import DailyRewardGuard from "@/components/guards/daily-reward-guard.tsx";
 import TravelStatusGuard from "@/components/guards/travel-status-guard.tsx";
 import AuthPage from "@/pages/auth-page.tsx";
 import EmailVerificationPage from "@/pages/email-verification-page.tsx";
@@ -72,94 +73,99 @@ export const router = createBrowserRouter([
           {
             element: <AuthGuard />,
             children: [
-              // TravelStatusGuard 밖: 프로필 설정, 설정
               {
-                path: ROUTES.PROFILE_COMPLETION,
-                element: <ProfileCompletionPage />,
-                handle: { title: "프로필 설정", isRoot: false },
-              },
-              {
-                path: ROUTES.SETTINGS,
-                element: <SettingsPage />,
-                handle: { title: "설정", isRoot: false },
-              },
-              {
-                path: ROUTES.MYPAGE,
-                element: <MyPage />,
-                handle: { title: "마이페이지", isRoot: false },
-              },
-              {
-                path: ROUTES.MYPAGE_DIARIES,
-                element: <MyDiariesPage />,
-                handle: { title: "나의 일기", isRoot: false },
-              },
-              {
-                path: ROUTES.MYPAGE_QUESTIONNAIRES,
-                element: <MyQuestionnairesPage />,
-                handle: { title: "나의 문답지", isRoot: false },
-              },
-              // TravelStatusGuard 안: 여행 상태에 따라 리다이렉트
-              {
-                element: <TravelStatusGuard />,
+                element: <DailyRewardGuard />,
                 children: [
+                  // TravelStatusGuard 밖: 프로필 설정, 설정
                   {
-                    path: ROUTES.HOME,
-                    element: <IndexPage />,
-                    handle: { title: "홈", isRoot: true },
+                    path: ROUTES.PROFILE_COMPLETION,
+                    element: <ProfileCompletionPage />,
+                    handle: { title: "프로필 설정", isRoot: false },
                   },
                   {
-                    path: ROUTES.TERMINAL,
-                    element: <TerminalPage />,
-                    handle: { title: "B0 터미널", isRoot: true },
+                    path: ROUTES.SETTINGS,
+                    element: <SettingsPage />,
+                    handle: { title: "설정", isRoot: false },
                   },
                   {
-                    path: ROUTES.TICKET_BOOKING,
-                    element: <TicketBookingPage />,
-                    handle: { title: "비행선 예매", isRoot: false },
+                    path: ROUTES.MYPAGE,
+                    element: <MyPage />,
+                    handle: { title: "마이페이지", isRoot: false },
                   },
                   {
-                    path: ROUTES.BOARDING,
-                    element: <BoardingPage />,
-                    handle: { title: "탑승중", isRoot: true },
+                    path: ROUTES.MYPAGE_DIARIES,
+                    element: <MyDiariesPage />,
+                    handle: { title: "나의 일기", isRoot: false },
                   },
                   {
-                    path: ROUTES.LIVING_ROOM,
-                    element: <LivingRoomPage />,
-                    handle: { title: "사랑방", isRoot: false },
+                    path: ROUTES.MYPAGE_QUESTIONNAIRES,
+                    element: <MyQuestionnairesPage />,
+                    handle: { title: "나의 문답지", isRoot: false },
                   },
+                  // TravelStatusGuard 안: 여행 상태에 따라 리다이렉트
                   {
-                    path: ROUTES.LOUNGE,
-                    element: <LoungePage />,
-                    handle: { title: "라운지", isRoot: false },
-                  },
-                  {
-                    path: ROUTES.PRIVATE_ROOM,
-                    element: <PrivateRoomPage />,
-                    handle: { title: "개인 숙소", isRoot: false },
-                  },
-                  {
-                    path: ROUTES.DIARY,
-                    element: <DiaryPage />,
-                    handle: { title: "일기장", isRoot: false },
-                  },
-                  {
-                    path: ROUTES.QUESTIONNAIRE,
-                    element: <QuestionnairePage />,
-                    handle: { title: "문답지", isRoot: false },
-                  },
-                  {
-                    path: ROUTES.GUESTHOUSE,
-                    element: <GuesthousePage />,
-                    handle: { title: "", isRoot: true },
-                  },
-                  {
-                    path: ROUTES.CHAT,
-                    element: <DMRoomPage />,
-                    handle: { title: "", isRoot: true },
-                  },
-                  {
-                    path: "*",
-                    element: <Navigate to={ROUTES.HOME} />,
+                    element: <TravelStatusGuard />,
+                    children: [
+                      {
+                        path: ROUTES.HOME,
+                        element: <IndexPage />,
+                        handle: { title: "홈", isRoot: true },
+                      },
+                      {
+                        path: ROUTES.TERMINAL,
+                        element: <TerminalPage />,
+                        handle: { title: "B0 터미널", isRoot: true },
+                      },
+                      {
+                        path: ROUTES.TICKET_BOOKING,
+                        element: <TicketBookingPage />,
+                        handle: { title: "비행선 예매", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.BOARDING,
+                        element: <BoardingPage />,
+                        handle: { title: "탑승중", isRoot: true },
+                      },
+                      {
+                        path: ROUTES.LIVING_ROOM,
+                        element: <LivingRoomPage />,
+                        handle: { title: "사랑방", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.LOUNGE,
+                        element: <LoungePage />,
+                        handle: { title: "라운지", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.PRIVATE_ROOM,
+                        element: <PrivateRoomPage />,
+                        handle: { title: "개인 숙소", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.DIARY,
+                        element: <DiaryPage />,
+                        handle: { title: "일기장", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.QUESTIONNAIRE,
+                        element: <QuestionnairePage />,
+                        handle: { title: "문답지", isRoot: false },
+                      },
+                      {
+                        path: ROUTES.GUESTHOUSE,
+                        element: <GuesthousePage />,
+                        handle: { title: "", isRoot: true },
+                      },
+                      {
+                        path: ROUTES.CHAT,
+                        element: <DMRoomPage />,
+                        handle: { title: "", isRoot: true },
+                      },
+                      {
+                        path: "*",
+                        element: <Navigate to={ROUTES.HOME} />,
+                      },
+                    ],
                   },
                 ],
               },
