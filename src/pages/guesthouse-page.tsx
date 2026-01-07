@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button.tsx";
 import { CityBadge } from "@/components/guesthouse/city-badge.tsx";
 import { SpaceList } from "@/components/guesthouse/space-list.tsx";
-import { SettingsButton } from "@/components/settings-button.tsx";
+import { TerminalHeader } from "@/components/terminal/terminal-header.tsx";
 import GlobalLoader from "@/components/global-loader.tsx";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
 import { useCity } from "@/hooks/queries/use-city.ts";
+import { useMe } from "@/hooks/queries/use-me.ts";
 import { ROUTES } from "@/lib/routes.ts";
 
 import { formatCheckoutTime } from "@/lib/date-utils.ts";
@@ -25,6 +26,9 @@ import img_bg_city from "@/assets/images/img_bg_city.webp";
 export default function GuesthousePage() {
   const navigate = useNavigate();
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+
+  // 사용자 정보 조회 (헤더 표시용)
+  const { data: user } = useMe();
 
   // 현재 체류 정보 조회
   const { data: roomStay, isLoading: isRoomStayLoading, isError: isRoomStayError } = useCurrentRoomStay();
@@ -68,9 +72,9 @@ export default function GuesthousePage() {
       <div className="absolute inset-0 bg-black/75" />
 
       <div className="absolute inset-0 flex flex-col">
-        <div className="flex h-20 justify-end px-6">
-          {/* 상단 설정 버튼 */}
-          <SettingsButton />
+        {/* 상단 헤더: 터미널과 동일한 스타일 적용 */}
+        <div className="px-6">
+          <TerminalHeader myEmoji={user?.profile_emoji ?? "🌟"} currentPoints={user?.current_points ?? 0} />
         </div>
 
         {/* 메인 콘텐츠 */}
