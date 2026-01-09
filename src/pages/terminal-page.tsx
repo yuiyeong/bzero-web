@@ -3,9 +3,11 @@ import { TerminalTitle } from "@/components/terminal/terminal-title.tsx";
 import { TerminalInfo } from "@/components/terminal/terminal-info.tsx";
 import { CityList } from "@/components/terminal/city-list.tsx";
 import { ComingSoonSection } from "@/components/terminal/coming-soon-section.tsx";
+import { AddToHomeScreenModal } from "@/components/terminal/add-to-home-screen-modal.tsx";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useActiveCities } from "@/hooks/queries/use-active-cities.ts";
 import { useAirships } from "@/hooks/queries/use-airships.ts";
+import { useAddToHomeScreen } from "@/hooks/use-add-to-home-screen.ts";
 import type { Airship } from "@/types.ts";
 
 const CITIES_PER_PAGE = 20;
@@ -18,6 +20,7 @@ export default function TerminalPage() {
     isError: isCitiesError,
   } = useActiveCities(0, CITIES_PER_PAGE);
   const { data: airshipListData, isLoading: isAirshipsLoading, isError: isAirshipsError } = useAirships();
+  const { isOpen: isAddToHomeScreenOpen, browserType, handleClose, handleDismissForever } = useAddToHomeScreen();
 
   const airships: Airship[] = airshipListData?.list ?? [];
 
@@ -49,6 +52,14 @@ export default function TerminalPage() {
           <ComingSoonSection />
         </div>
       </div>
+
+      {/* 홈화면 추가 안내 모달 */}
+      <AddToHomeScreenModal
+        open={isAddToHomeScreenOpen}
+        onOpenChange={handleClose}
+        browserType={browserType}
+        onDismissForever={handleDismissForever}
+      />
     </div>
   );
 }
