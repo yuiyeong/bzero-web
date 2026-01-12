@@ -94,10 +94,10 @@ export default function DiaryPage() {
             initialData={
               todayDiary
                 ? {
-                  title: todayDiary.title,
-                  content: todayDiary.content,
-                  mood: todayDiary.mood,
-                }
+                    title: todayDiary.title,
+                    content: todayDiary.content,
+                    mood: todayDiary.mood,
+                  }
                 : undefined
             }
             onSubmit={submitDiary}
