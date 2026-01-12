@@ -1,22 +1,24 @@
 /**
  * 메시지 목록 컴포넌트 (무한 스크롤 지원)
  */
-import { useRef, useEffect, useCallback, useMemo } from "react";
-import { useChatConnectionStatus } from "@/stores/chat-store.ts";
-import { useRoomMessages } from "@/hooks/queries/use-room-messages.ts";
-import { useRoomMembers } from "@/hooks/queries/use-room-members.ts";
-import { useMe } from "@/hooks/queries/use-me.ts";
-import { joinSenderToMessages } from "@/api/chat.ts";
+import { CardMessage } from "@/components/chat/card-message.tsx";
 import { MessageBubble } from "@/components/chat/message-bubble.tsx";
 import { SystemMessage } from "@/components/chat/system-message.tsx";
-import { CardMessage } from "@/components/chat/card-message.tsx";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { joinSenderToMessages } from "@/api/chat.ts";
+import { useMe } from "@/hooks/queries/use-me.ts";
+import { useRoomMembers } from "@/hooks/queries/use-room-members.ts";
+import { useRoomMessages } from "@/hooks/queries/use-room-messages.ts";
 import type { ChatMessage } from "@/types.ts";
+import { useChatConnectionStatus } from "@/stores/chat-store.ts";
 
 interface MessageListProps {
   /** 룸 ID */
   roomId: string;
   /** 마지막 내 메시지 ref 콜백 (iOS Safari 키보드 처리용) */
   onLastOwnMessageRef?: (ref: HTMLDivElement | null) => void;
+  /** 실패한 메시지 재전송 콜백 (Optimistic UI) */
+  onRetryMessage?: (tempId: string) => void;
 }
 
 /**
@@ -26,7 +28,7 @@ interface MessageListProps {
  * - 새 메시지 수신 시 하단에 있으면 자동 스크롤
  * - iOS Safari 키보드 처리를 위해 마지막 내 메시지 ref 콜백 지원
  */
-export function MessageList({ roomId, onLastOwnMessageRef }: MessageListProps) {
+export function MessageList({ roomId, onLastOwnMessageRef, onRetryMessage }: MessageListProps) {
   const connectionStatus = useChatConnectionStatus();
   const { data: me } = useMe();
 
@@ -171,6 +173,7 @@ export function MessageList({ roomId, onLastOwnMessageRef }: MessageListProps) {
         ref={isLastOwnMessage ? lastOwnMessageRef : undefined}
         message={message}
         isOwn={isOwn}
+        onRetry={onRetryMessage}
       />
     );
   };

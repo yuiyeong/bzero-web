@@ -1,14 +1,14 @@
+import { MessageInput } from "@/components/chat/message-input.tsx";
+import GlobalLoader from "@/components/global-loader.tsx";
+import MessageBubble from "@/components/lounge/MessageBubble.tsx";
+import { useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useDMMessages, useMyDMRooms } from "@/hooks/queries/use-dm.ts";
 import { useMe } from "@/hooks/queries/use-me.ts";
 import { useDMSocket } from "@/hooks/use-dm-socket.ts";
 import { useKeyboardDismiss } from "@/hooks/use-keyboard-dismiss.ts";
-import { MessageInput } from "@/components/chat/message-input.tsx";
-import MessageBubble from "@/components/lounge/MessageBubble.tsx";
-import GlobalLoader from "@/components/global-loader.tsx";
-import { useEffect, useRef, useMemo } from "react";
-import bgDM from "@/assets/images/img_bg_dm.webp";
 import { trackPageView } from "@/lib/analytics.ts";
+import bgDM from "@/assets/images/img_bg_dm.webp";
 
 export default function DMRoomPage() {
   const navigate = useNavigate();
@@ -26,37 +26,27 @@ export default function DMRoomPage() {
   } = useDMMessages(dmRoomId!);
 
   // Socket
-  const { sendMessage, isConnected } = useDMSocket({
+  const { sendMessage, isConnected, retryMessage } = useDMSocket({
     dmRoomId: dmRoomId!,
     enabled: !!dmRoomId && !!me,
   });
 
-  // Find Room & Partner
-  // Note: dmRoomsResponse might not contain this room if we navigated directly via URL and list wasn't fetched/cached
-  // But strictly `useMyDMRooms` fetches list.
-  // We need partner info
+  // 대화 상대방 정보 추출
   const myRoom = dmRoomsResponse?.list?.find((r) => r.dm_room_id === dmRoomId);
-  let partnerNickname = "Unknown";
-  let partnerProfile: string | null = null;
+  const isRequester = myRoom?.requester_id === me?.user_id;
+  const partnerNickname = myRoom
+    ? (isRequester ? myRoom.receiver_nickname : myRoom.requester_nickname) || "Unknown"
+    : "Unknown";
+  const partnerProfile = myRoom ? (isRequester ? myRoom.receiver_profile_image : myRoom.requester_profile_image) : null;
 
-  if (myRoom && me) {
-    if (myRoom.requester_id === me.user_id) {
-      partnerNickname = myRoom.receiver_nickname || "Unknown";
-      partnerProfile = myRoom.receiver_profile_image;
-    } else {
-      partnerNickname = myRoom.requester_nickname || "Unknown";
-      partnerProfile = myRoom.requester_profile_image;
-    }
-  }
-
-  // Flatten messages (useMemo로 감싸서 매 렌더링마다 새 배열 생성 방지)
+  // 메시지 목록 평탄화
   const messages = useMemo(() => messagesData?.pages.flatMap((p) => p.messages) ?? [], [messagesData?.pages]);
 
-  // Scroll to bottom
+  // 스크롤 관련 refs
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastMessageId = messages.at(-1)?.dm_id;
 
-  // 모바일 키보드 처리
+  // iOS Safari 키보드 처리
   const { scheduleKeyboardDismiss, dismissKeyboardIfScheduled } = useKeyboardDismiss();
   const lastOwnMessageRef = useRef<HTMLDivElement | null>(null);
   const prevLastOwnMessageIdRef = useRef<string | null>(null);
@@ -76,9 +66,8 @@ export default function DMRoomPage() {
     trackPageView("1:1 대화", `/dm/${dmRoomId}`);
   }, [dmRoomId]);
 
+  // 새 메시지 수신 시 하단으로 스크롤
   useEffect(() => {
-    // Only scroll if near bottom or initial load?
-    // For now simple auto scroll on new message (lastMessageId change)
     if (scrollRef.current) {
       requestAnimationFrame(() => {
         if (scrollRef.current) {
@@ -86,17 +75,15 @@ export default function DMRoomPage() {
         }
       });
     }
-  }, [lastMessageId]); // Trigger only when newest message changes
+  }, [lastMessageId]);
 
-  // 새 내 메시지 감지 시 키보드 dismiss 처리 (모바일)
+  // 새 내 메시지 감지 시 키보드 dismiss 처리 (iOS Safari)
   useEffect(() => {
     if (lastOwnMessage && lastOwnMessage.dm_id !== prevLastOwnMessageIdRef.current) {
       prevLastOwnMessageIdRef.current = lastOwnMessage.dm_id;
       dismissKeyboardIfScheduled(lastOwnMessageRef.current);
     }
   }, [lastOwnMessage, dismissKeyboardIfScheduled]);
-
-  // Observer for Infinite Scroll would go here (fetchNextPage when scrolling up)
 
   if (isLoadingMessages || !me) {
     return <GlobalLoader />;
@@ -134,7 +121,7 @@ export default function DMRoomPage() {
           </div>
         </header>
 
-        {/* Messages */}
+        {/* 메시지 목록 */}
         <div ref={scrollRef} className="chrome-scrollbar-hidden flex-1 overflow-y-auto p-4">
           {hasNextPage && (
             <button
@@ -142,7 +129,7 @@ export default function DMRoomPage() {
               disabled={isFetchingNextPage}
               className="w-full py-2 text-center text-xs text-zinc-400"
             >
-              {isFetchingNextPage ? "Loading..." : "Load Older Messages"}
+              {isFetchingNextPage ? "불러오는 중..." : "이전 메시지 불러오기"}
             </button>
           )}
 
@@ -159,13 +146,14 @@ export default function DMRoomPage() {
                   ref={isLastOwnMessage ? lastOwnMessageRef : undefined}
                   message={msg}
                   isMe={isMe}
+                  onRetry={retryMessage}
                 />
               );
             })
           )}
         </div>
 
-        {/* Input */}
+        {/* 입력 영역 */}
         <div className="flex-none">
           <MessageInput onSend={sendMessage} onMessageSent={scheduleKeyboardDismiss} disabled={!isConnected} />
         </div>
