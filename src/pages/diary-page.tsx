@@ -1,23 +1,17 @@
-import { createDiary, getMyDiaries } from "@/api/diary.ts";
-import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
+import { createDiary, getMyDiaries, updateDiary } from "@/api/diary.ts";
 import img_bg_private_room from "@/assets/images/img_bg_private_room.webp";
+import DiaryForm from "@/components/diary/diary-form.tsx";
 import GlobalLoader from "@/components/global-loader.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Textarea } from "@/components/ui/textarea.tsx";
+import { MOODS } from "@/constants/diary.ts";
+import { useCurrentRoomStay } from "@/hooks/queries/use-current-room-stay.ts";
+import { trackEvent } from "@/lib/analytics.ts";
 import type { B0ApiError } from "@/lib/api-errors.ts";
+import { queryKeys } from "@/lib/query-client.ts";
+import type { CreateDiaryRequest, UpdateDiaryRequest } from "@/types.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { queryKeys } from "@/lib/query-client.ts";
-import { trackEvent } from "@/lib/analytics.ts";
-
-const MOODS = [
-  { emoji: "😊", value: "happy", label: "행복" },
-  { emoji: "😐", value: "peaceful", label: "평온" },
-  { emoji: "😢", value: "sad", label: "슬픔" },
-  { emoji: "😡", value: "anxious", label: "불안" }, // anxious로 매핑 (화남->불안/걱정 유사 맥락으로 처리하거나 API 스펙 확인 필요, 일단 anxious)
-  { emoji: "😴", value: "tired", label: "피곤" },
-];
 
 export default function DiaryPage() {
   const queryClient = useQueryClient();
@@ -34,12 +28,22 @@ export default function DiaryPage() {
 
   const todayDiary = diaryList?.items[0];
 
-  // 일기 작성 뮤테이션
+  // 일기 작성/수정 뮤테이션
   const { mutate: submitDiary, isPending: isSubmitting } = useMutation({
-    mutationFn: createDiary,
+    mutationFn: (data: CreateDiaryRequest | UpdateDiaryRequest) => {
+      if (todayDiary) {
+        return updateDiary(todayDiary.diary_id, data);
+      }
+      return createDiary(data as CreateDiaryRequest);
+    },
     onSuccess: () => {
-      trackEvent("diary_save_success");
-      toast.success("일기가 저장되었습니다. +5 포인트 획득!");
+      if (todayDiary) {
+        trackEvent("diary_update_success");
+        toast.success("일기가 수정되었습니다.");
+      } else {
+        trackEvent("diary_save_success");
+        toast.success("일기가 저장되었습니다. +5 포인트 획득!");
+      }
       queryClient.invalidateQueries({ queryKey: queryKeys.diaries.list });
       setIsWriteMode(false);
     },
@@ -47,32 +51,6 @@ export default function DiaryPage() {
       toast.error(error.message || "일기 저장 실패");
     },
   });
-
-  const [title, setTitle] = useState("");
-  const [mood, setMood] = useState("");
-  const [content, setContent] = useState("");
-  const [errors, setErrors] = useState<{ title?: string; mood?: string; content?: string }>({});
-
-  const validate = () => {
-    const newErrors: { title?: string; mood?: string; content?: string } = {};
-    if (!title.trim()) newErrors.title = "제목을 입력해주세요";
-    if (!mood) newErrors.mood = "기분을 선택해주세요";
-    if (content.length < 10) newErrors.content = "10자 이상 작성해주세요";
-    if (content.length > 500) newErrors.content = "500자 이내로 작성해주세요";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    submitDiary({
-      title,
-      mood,
-      content,
-    });
-  };
 
   if (isLoading || isRoomStayLoading) return <GlobalLoader />;
 
@@ -84,15 +62,14 @@ export default function DiaryPage() {
       {/* 헤더 */}
       <div className="relative z-10 flex h-14 items-center justify-between px-4">
         <div />
-        {/* 작성 모드일 때만 저장 버튼 표시 */}
-        {!todayDiary || isWriteMode ? (
+        {/* 오늘 일기가 있고, 쓰기 모드가 아닐 때 '수정' 버튼 표시 */}
+        {todayDiary && !isWriteMode ? (
           <Button
             variant="ghost"
-            className="font-bold text-indigo-400 hover:text-indigo-300"
-            onClick={onSubmit}
-            disabled={isSubmitting}
+            className="font-bold text-zinc-400 hover:text-white"
+            onClick={() => setIsWriteMode(true)}
           >
-            {isSubmitting ? "저장 중..." : "저장"}
+            수정
           </Button>
         ) : (
           <div />
@@ -112,67 +89,23 @@ export default function DiaryPage() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-1 flex-col">
-            {/* 날짜 표시 */}
-            <p className="mb-6 text-base text-zinc-400">
-              {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
-            </p>
-
-            <div className="flex flex-1 flex-col gap-6">
-              {/* 제목 입력 */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-zinc-400">제목</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="오늘의 제목"
-                  className="w-full border-b border-white/10 bg-transparent py-2 text-xl font-bold text-white placeholder:text-zinc-600 focus:border-white/50 focus:outline-none"
-                />
-                {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
-              </div>
-
-              {/* 내용 작성 */}
-              <div className="flex flex-1 flex-col gap-2">
-                <label className="text-sm font-medium text-zinc-400">오늘의 기록</label>
-                <div className="flex flex-1 flex-col gap-1">
-                  <Textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="오늘 하루는 어떠셨나요?"
-                    className="flex-1 resize-none border-white/10 bg-white/5 text-base text-white placeholder:text-zinc-600 focus:border-white/30"
-                  />
-                  <div className="flex justify-between text-xs text-zinc-500">
-                    {errors.content && <span className="text-red-400">{errors.content}</span>}
-                    <span className="ml-auto">{content.length}/500자</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 기분 선택 */}
-              <div className="flex flex-col gap-2 pb-6">
-                <label className="text-sm font-medium text-zinc-400">오늘의 기분</label>
-                <div className="flex justify-between gap-1">
-                  {MOODS.map((m) => (
-                    <button
-                      key={m.value}
-                      type="button"
-                      onClick={() => setMood(m.value)}
-                      className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl transition-all ${
-                        mood === m.value
-                          ? "scale-110 bg-white/20 ring-2 ring-indigo-400"
-                          : "bg-white/5 grayscale filter hover:bg-white/10 hover:grayscale-0"
-                      }`}
-                      title={m.label}
-                    >
-                      {m.emoji}
-                    </button>
-                  ))}
-                </div>
-                {errors.mood && <p className="text-xs text-red-400">{errors.mood}</p>}
-              </div>
-            </div>
-          </div>
+          // 작성 또는 수정 모드
+          <DiaryForm
+            initialData={
+              todayDiary
+                ? {
+                    title: todayDiary.title,
+                    content: todayDiary.content,
+                    mood: todayDiary.mood,
+                  }
+                : undefined
+            }
+            onSubmit={submitDiary}
+            isSubmitting={isSubmitting}
+            // 수정 모드일 때 취소 버튼 활성화
+            onCancel={todayDiary ? () => setIsWriteMode(false) : undefined}
+            submitLabel={todayDiary ? "수정완료" : "저장"}
+          />
         )}
       </div>
     </div>
