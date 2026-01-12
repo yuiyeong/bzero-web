@@ -268,6 +268,11 @@ export interface CreateQuestionnaireRequest {
   answer: string;
 }
 
+/** 문답지 답변 수정 요청 본문 */
+export interface UpdateQuestionnaireRequest {
+  answer: string;
+}
+
 /** 채팅 메시지 타입 */
 export type ChatMessageType = "text" | "card_shared" | "system";
 

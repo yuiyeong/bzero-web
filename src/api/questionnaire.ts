@@ -1,7 +1,14 @@
 /**
  * 백엔드 문답지(Questionnaire) API 함수 모음
  */
-import type { CityQuestion, CreateQuestionnaireRequest, DataResponse, ListResponse, Questionnaire } from "@/types.ts";
+import type {
+  CityQuestion,
+  CreateQuestionnaireRequest,
+  DataResponse,
+  ListResponse,
+  Questionnaire,
+  UpdateQuestionnaireRequest,
+} from "@/types.ts";
 import apiClient from "@/lib/api-client.ts";
 
 /**
@@ -39,5 +46,20 @@ export async function getMyQuestionnaires(params: {
  */
 export async function createQuestionnaire(body: CreateQuestionnaireRequest): Promise<Questionnaire> {
   const { data } = await apiClient.post<DataResponse<Questionnaire>>("/questionnaires", body);
+  return data.data;
+}
+
+/**
+ * 답변 수정
+ *
+ * @param questionnaireId - 수정할 문답지 ID
+ * @param body - 답변 수정 요청 본문
+ * @returns 수정된 답변 정보
+ */
+export async function updateQuestionnaire(
+  questionnaireId: string,
+  body: UpdateQuestionnaireRequest
+): Promise<Questionnaire> {
+  const { data } = await apiClient.patch<DataResponse<Questionnaire>>(`/questionnaires/${questionnaireId}`, body);
   return data.data;
 }
