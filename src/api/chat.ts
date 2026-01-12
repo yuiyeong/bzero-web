@@ -1,7 +1,15 @@
 /**
  * 채팅 관련 REST API 함수
  */
-import type { ChatMessage, ChatMessagePage, ChatMessageSender, ConversationCard, ListResponse, User } from "@/types.ts";
+import type {
+  ChatMessage,
+  ChatMessagePage,
+  ChatMessageSender,
+  ConversationCard,
+  ListResponse,
+  MessageStatus,
+  User,
+} from "@/types.ts";
 import apiClient from "@/lib/api-client.ts";
 import type { InfiniteData } from "@tanstack/react-query";
 
@@ -144,4 +152,113 @@ export function addMessageToInfiniteData(
     ...oldData,
     pages: updatedPages,
   };
+}
+
+/**
+ * 임시 메시지를 실제 메시지로 교체
+ *
+ * Optimistic UI에서 서버 응답 수신 시 임시 메시지를 실제 메시지로 교체
+ *
+ * @param oldData - 기존 캐시 데이터
+ * @param tempId - 교체할 임시 메시지의 tempId
+ * @param realMessage - 서버에서 받은 실제 메시지
+ * @returns 업데이트된 캐시 데이터
+ */
+export function replaceTempMessageInInfiniteData(
+  oldData: InfiniteData<ChatMessagePage> | undefined,
+  tempId: string,
+  realMessage: ChatMessage
+): InfiniteData<ChatMessagePage> | undefined {
+  if (!oldData) return oldData;
+
+  const updatedPages = oldData.pages.map((page) => ({
+    ...page,
+    messages: page.messages.map((msg) => (msg.tempId === tempId ? { ...realMessage, status: "sent" as const } : msg)),
+  }));
+
+  return {
+    ...oldData,
+    pages: updatedPages,
+  };
+}
+
+/**
+ * 메시지 상태 업데이트 (tempId 기반)
+ *
+ * Optimistic UI에서 타임아웃 시 failed 상태로 변경할 때 사용
+ *
+ * @param oldData - 기존 캐시 데이터
+ * @param tempId - 업데이트할 메시지의 tempId
+ * @param status - 새로운 상태
+ * @returns 업데이트된 캐시 데이터
+ */
+export function updateMessageStatusInInfiniteData(
+  oldData: InfiniteData<ChatMessagePage> | undefined,
+  tempId: string,
+  status: MessageStatus
+): InfiniteData<ChatMessagePage> | undefined {
+  if (!oldData) return oldData;
+
+  const updatedPages = oldData.pages.map((page) => ({
+    ...page,
+    messages: page.messages.map((msg) => (msg.tempId === tempId ? { ...msg, status } : msg)),
+  }));
+
+  return {
+    ...oldData,
+    pages: updatedPages,
+  };
+}
+
+/**
+ * tempId로 메시지를 캐시에서 삭제
+ *
+ * 재시도 시 기존 실패 메시지를 삭제할 때 사용
+ *
+ * @param oldData - 기존 캐시 데이터
+ * @param tempId - 삭제할 메시지의 tempId
+ * @returns 업데이트된 캐시 데이터
+ */
+export function removeMessageFromInfiniteData(
+  oldData: InfiniteData<ChatMessagePage> | undefined,
+  tempId: string
+): InfiniteData<ChatMessagePage> | undefined {
+  if (!oldData) return oldData;
+
+  const updatedPages = oldData.pages.map((page) => ({
+    ...page,
+    messages: page.messages.filter((msg) => msg.tempId !== tempId),
+  }));
+
+  return {
+    ...oldData,
+    pages: updatedPages,
+  };
+}
+
+/**
+ * sending 상태의 메시지 중 content가 일치하는 것 찾기
+ *
+ * new_message 수신 시 자신이 보낸 임시 메시지를 찾을 때 사용
+ *
+ * @param oldData - 캐시 데이터
+ * @param userId - 현재 사용자 ID
+ * @param content - 메시지 내용
+ * @returns 찾은 메시지의 tempId 또는 undefined
+ */
+export function findSendingMessageTempId(
+  oldData: InfiniteData<ChatMessagePage> | undefined,
+  userId: string,
+  content: string
+): string | undefined {
+  if (!oldData) return undefined;
+
+  for (const page of oldData.pages) {
+    for (const msg of page.messages) {
+      if (msg.status === "sending" && msg.user_id === userId && msg.content === content && msg.tempId) {
+        return msg.tempId;
+      }
+    }
+  }
+  return undefined;
 }
