@@ -1,16 +1,16 @@
 /**
  * 채팅방 메인 컨테이너 컴포넌트
  */
-import { useState, useCallback } from "react";
-import { ChatHeader } from "@/components/chat/chat-header.tsx";
-import { MessageList } from "@/components/chat/message-list.tsx";
-import { MessageInput } from "@/components/chat/message-input.tsx";
-import { CardModal } from "@/components/chat/card-modal.tsx";
-import { useSocket } from "@/hooks/use-socket.ts";
-import { useKeyboardDismiss } from "@/hooks/use-keyboard-dismiss.ts";
-import { useChatConnectionStatus, useChatError } from "@/stores/chat-store.ts";
 import { Button } from "@/components/ui/button.tsx";
+import { CardModal } from "@/components/chat/card-modal.tsx";
+import { ChatHeader } from "@/components/chat/chat-header.tsx";
+import { MessageInput } from "@/components/chat/message-input.tsx";
+import { MessageList } from "@/components/chat/message-list.tsx";
+import { useCallback, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
+import { useKeyboardDismiss } from "@/hooks/use-keyboard-dismiss.ts";
+import { useSocket } from "@/hooks/use-socket.ts";
+import { useChatConnectionStatus, useChatError } from "@/stores/chat-store.ts";
 
 interface ChatRoomProps {
   /** 룸 ID */
@@ -26,7 +26,7 @@ interface ChatRoomProps {
  * iOS Safari 키보드 처리: 메시지 전송 후 새 메시지에 focus하여 키보드 내림
  */
 export function ChatRoom({ roomId, cityId }: ChatRoomProps) {
-  const { sendMessage, shareCard, reconnect } = useSocket({ roomId });
+  const { sendMessage, shareCard, reconnect, retryMessage } = useSocket({ roomId });
   const connectionStatus = useChatConnectionStatus();
   const error = useChatError();
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
@@ -84,7 +84,7 @@ export function ChatRoom({ roomId, cityId }: ChatRoomProps) {
       <ChatHeader roomId={roomId} connectionStatus={connectionStatus} />
 
       {/* 메시지 목록 */}
-      <MessageList roomId={roomId} onLastOwnMessageRef={handleLastOwnMessageRef} />
+      <MessageList roomId={roomId} onLastOwnMessageRef={handleLastOwnMessageRef} onRetryMessage={retryMessage} />
 
       {/* 입력 영역 */}
       <MessageInput

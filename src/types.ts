@@ -276,6 +276,9 @@ export interface UpdateQuestionnaireRequest {
 /** 채팅 메시지 타입 */
 export type ChatMessageType = "text" | "card_shared" | "system";
 
+/** 메시지 전송 상태 (Optimistic UI용, 프론트엔드 전용) */
+export type MessageStatus = "sending" | "sent" | "failed";
+
 /** 채팅 메시지 (백엔드 ChatMessageResponse와 동일) */
 export interface ChatMessage {
   /** 메시지 고유 ID */
@@ -296,6 +299,10 @@ export interface ChatMessage {
   created_at: string;
   /** 발신자 정보 (프론트엔드에서 조인) */
   sender?: ChatMessageSender;
+  /** 전송 상태 (Optimistic UI용, 프론트엔드 전용) */
+  status?: MessageStatus;
+  /** 임시 메시지 ID (Optimistic UI용, 프론트엔드 전용) */
+  tempId?: string;
 }
 
 /** 메시지 발신자 정보 (User에서 필요한 필드만 추출) */
@@ -359,6 +366,10 @@ export interface DirectMessage {
   content: string;
   is_read: boolean;
   created_at: string;
+  /** 전송 상태 (Optimistic UI용, 프론트엔드 전용) */
+  status?: MessageStatus;
+  /** 임시 메시지 ID (Optimistic UI용, 프론트엔드 전용) */
+  tempId?: string;
 }
 
 /** 1:1 대화방 (백엔드 DirectMessageRoomResponse와 동일) */
