@@ -58,3 +58,16 @@ export function trackPageView(pageTitle: string, pagePath: string): void {
     page_path: pagePath,
   });
 }
+
+/**
+ * 앱 실행 이벤트 전송 (PWA/Platform 추적)
+ *
+ * @param displayMode - 'standalone' | 'browser'
+ * @param platform - 'ios' | 'android' | 'web'
+ */
+export function trackAppLaunch(displayMode: string, platform: string): void {
+  trackEvent("app_launch", {
+    display_mode: displayMode,
+    platform: platform,
+  });
+}
