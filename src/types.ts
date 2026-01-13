@@ -86,8 +86,8 @@ export interface City {
   image_url: string | null;
   /** 기본 비용 (포인트) */
   base_cost_points: number;
-  /** 기본 소요 시간 (시간) */
-  base_duration_hours: number;
+  /** 기본 소요 시간 (분) */
+  base_duration_minutes: number;
   is_active: boolean;
   display_order: number;
   created_at: string;
@@ -106,7 +106,7 @@ export interface Airship {
   image_url: string | null;
   /** 비용 계수 (티켓 가격 = city.base_cost_points × cost_factor) */
   cost_factor: number;
-  /** 시간 계수 (소요 시간 = city.base_duration_hours / duration_factor) */
+  /** 시간 계수 (소요 시간 = city.base_duration_minutes / duration_factor) */
   duration_factor: number;
   created_at: string;
   updated_at: string;
