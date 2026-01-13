@@ -2,7 +2,7 @@
   "name": "B0 - 지하 0층",
   "short_name": "B0",
   "description": "지하 0층에서 출발하는 비행선을 타고 가상 세계를 여행하며 힐링과 자기성찰을 경험하세요.",
-  "start_url": "/",
+  "start_url": "/?utm_source=pwa&utm_medium=standalone",
   "display": "standalone",
   "theme_color": "#0f0f23",
   "background_color": "#0f0f23",
