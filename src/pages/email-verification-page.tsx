@@ -1,9 +1,9 @@
-import { LoaderPinwheelIcon } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
+import { LoaderPinwheelIcon } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import supabase from "@/lib/supabase.ts";
 import { toast } from "sonner";
+import supabase from "@/lib/supabase.ts";
 import { ROUTES } from "@/lib/routes.ts";
 import { logger } from "@/lib/logger.ts";
 
@@ -61,6 +61,7 @@ export default function EmailVerificationPage() {
         <div className="flex flex-col gap-2 text-center">
           <p>회원가입한 이메일을 통해</p>
           <p>인증을 완료해주세요.</p>
+          <p className="mt-4 text-sm text-zinc-500">이메일이 보이지 않으시면, 스팸 메일함을 확인해주세요.</p>
         </div>
       </div>
       <Button className="w-full py-6 text-lg" onClick={handleCompleteClicked} disabled={isChecking}>
