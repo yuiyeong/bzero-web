@@ -216,6 +216,7 @@ export function useSocket({ roomId, enabled = true }: UseSocketOptions): UseSock
 
         // 멤버 목록 갱신 (입장/퇴장 메시지이므로)
         void queryClient.invalidateQueries({ queryKey: queryKeys.chat.members(roomId) });
+        void queryClient.invalidateQueries({ queryKey: queryKeys.room.members(roomId) });
       });
 
       // --- 에러 수신 ---
