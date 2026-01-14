@@ -88,6 +88,7 @@ export default function TicketBookingPage() {
         airships={airships}
         selectedAirshipId={selectedAirship?.airship_id ?? null}
         baseCostPoints={city.base_cost_points}
+        baseDurationMinutes={city.base_duration_minutes}
         onSelectAirship={handleSelectAirship}
       />
       <PaymentSummary

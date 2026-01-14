@@ -28,6 +28,8 @@ export const ROUTES = {
   TICKET_BOOKING: "/terminal/city/:cityId/booking",
   /** 비행선 탑승 중 (이동 화면) */
   BOARDING: "/boarding",
+  /** 체크인 중 (도착 후 체크인 처리 화면) */
+  CHECK_IN: "/check-in",
   /** 게스트하우스 */
   GUESTHOUSE: "/guesthouses/:guesthouseId",
   /** 사랑방 */

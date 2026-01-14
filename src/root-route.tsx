@@ -8,6 +8,7 @@ import IndexPage from "@/pages/index-page.tsx";
 import TerminalPage from "@/pages/terminal-page.tsx";
 import TicketBookingPage from "@/pages/ticket-booking-page.tsx";
 import BoardingPage from "@/pages/boarding-page.tsx";
+import CheckInPage from "@/pages/check-in-page.tsx";
 import GuesthousePage from "@/pages/guesthouse-page.tsx";
 import MainLayout from "@/components/layout/main-layout.tsx";
 import OnboardingGuard from "@/components/guards/onboarding-guard.tsx";
@@ -125,6 +126,11 @@ export const router = createBrowserRouter([
                         path: ROUTES.BOARDING,
                         element: <BoardingPage />,
                         handle: { title: "탑승중", isRoot: true },
+                      },
+                      {
+                        path: ROUTES.CHECK_IN,
+                        element: <CheckInPage />,
+                        handle: { title: "체크인", isRoot: true },
                       },
                       {
                         path: ROUTES.LIVING_ROOM,

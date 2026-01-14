@@ -1,9 +1,7 @@
 import { TicketCard } from "@/components/boarding/ticket-card.tsx";
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useBoardingTicket } from "@/hooks/queries/use-boarding-ticket.ts";
-import { queryKeys } from "@/lib/query-client.ts";
 import { ROUTES } from "@/lib/routes.ts";
 import GlobalLoader from "@/components/global-loader.tsx";
 import img_bg_boarding from "@/assets/images/img_bg_boarding.webp";
@@ -19,7 +17,6 @@ import { trackEvent } from "@/lib/analytics.ts";
  */
 export default function BoardingPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: ticket, isLoading, isError } = useBoardingTicket();
 
@@ -30,18 +27,17 @@ export default function BoardingPage() {
     }
   }, [isError, navigate]);
 
-  // 도착 시 쿼리 캐시 무효화 후 홈으로 이동 (TravelStatusGuard가 체크인 상태 감지 후 게스트하우스로 리다이렉트)
+  // 도착 시 체크인 페이지로 이동
   const handleArrival = useCallback(async () => {
     if (ticket) {
       trackEvent("arrival", { city_id: ticket.city.city_id });
     }
-
-    // 서버 상태 변경 반영을 위해 관련 쿼리 캐시 무효화
-    await queryClient.invalidateQueries({ queryKey: queryKeys.tickets.boarding });
-    await queryClient.invalidateQueries({ queryKey: queryKeys.roomStays.current });
-
-    navigate(ROUTES.HOME, { replace: true });
-  }, [queryClient, navigate, ticket]);
+    // 체크인 페이지로 이동 (city 이름을 state로 전달)
+    navigate(ROUTES.CHECK_IN, {
+      replace: true,
+      state: { cityName: ticket?.city.name },
+    });
+  }, [navigate, ticket]);
 
   if (isLoading || !ticket) {
     return <GlobalLoader />;
