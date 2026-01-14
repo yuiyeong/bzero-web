@@ -21,7 +21,15 @@ export default function TravelStatusGuard() {
 
   // 로딩 중
   const isLoading = isRoomStayLoading || isTicketLoading;
-  if (isLoading) return <GlobalLoader />;
+  const isOnTravelPage = location.pathname === ROUTES.BOARDING || location.pathname === ROUTES.CHECK_IN;
+
+  if (isLoading) {
+    // BOARDING이나 CHECK_IN 경로에 있으면 해당 페이지가 자체 로딩 UI를 처리
+    if (isOnTravelPage) {
+      return <Outlet />;
+    }
+    return <GlobalLoader />;
+  }
 
   // 1. 체크인 중인 체류가 있으면 → 게스트하우스 페이지로 리다이렉트
   if (roomStay && !isRoomStayError) {
@@ -33,15 +41,23 @@ export default function TravelStatusGuard() {
 
   // 2. 탑승 상태 처리
   if (ticket && !isTicketError) {
-    // 탑승 중인데 /boarding이 아니면 → 탑승 화면으로 리다이렉트
-    if (location.pathname !== ROUTES.BOARDING) {
-      return <Navigate to={ROUTES.BOARDING} replace />;
+    const arrivalTime = new Date(ticket.arrival_datetime).getTime();
+    const isArrived = Date.now() >= arrivalTime;
+
+    if (isArrived) {
+      // 도착 시간 지남 → 체크인 페이지로
+      if (location.pathname !== ROUTES.CHECK_IN) {
+        return <Navigate to={ROUTES.CHECK_IN} state={{ cityName: ticket.city.name }} replace />;
+      }
+    } else {
+      // 아직 비행 중 → 탑승 페이지로
+      if (location.pathname !== ROUTES.BOARDING) {
+        return <Navigate to={ROUTES.BOARDING} replace />;
+      }
     }
-  } else {
-    // 탑승 중이 아닌데 /boarding에 있으면 → 홈으로 리다이렉트
-    if (location.pathname === ROUTES.BOARDING) {
-      return <Navigate to={ROUTES.HOME} replace />;
-    }
+  } else if (isOnTravelPage) {
+    // 탑승 중이 아닌데 /boarding 또는 /check-in에 있으면 → 홈으로 리다이렉트
+    return <Navigate to={ROUTES.HOME} replace />;
   }
 
   // 3. 둘 다 아니면 → 자식 라우트 렌더링
