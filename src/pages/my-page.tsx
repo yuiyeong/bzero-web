@@ -2,13 +2,15 @@ import { useNavigate } from "react-router";
 import { useMe } from "@/hooks/queries/use-me";
 import { ROUTES } from "@/lib/routes";
 import bgTerminal from "@/assets/images/img_bg_boarding.webp";
-import { Loader2, ChevronRight, BookText, FileText, MessageCircleQuestion } from "lucide-react";
+import { Loader2, ChevronRight, BookText, FileText, MessageCircleQuestion, LogOut } from "lucide-react";
+import { useSignOut } from "@/hooks/mutations/use-sign-out";
 
 import { EXTERNAL_LINKS } from "@/lib/external-links";
 
 export default function MyPage() {
   const navigate = useNavigate();
   const { data: user, isLoading } = useMe();
+  const { mutate: signOut, isPending: isSigningOut } = useSignOut();
 
   if (isLoading || !user) {
     return (
@@ -25,6 +27,12 @@ export default function MyPage() {
 
   const handleContactClick = () => {
     window.open(EXTERNAL_LINKS.INQUIRY_FORM, "_blank");
+  };
+
+  const handleSignOut = () => {
+    if (window.confirm("정말 로그아웃하시겠습니까?")) {
+      signOut();
+    }
   };
 
   return (
@@ -74,6 +82,24 @@ export default function MyPage() {
             <ChevronRight className="h-5 w-5 text-zinc-500" />
           </button>
         </nav>
+
+        {/* Divider */}
+        <div className="mx-6 border-t border-white/10" />
+
+        {/* Logout Section */}
+        <div className="px-6 py-4">
+          <button
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className="flex w-full items-center gap-4 rounded-xl bg-zinc-900/50 px-4 py-4 transition-colors hover:bg-zinc-800/50 disabled:opacity-50"
+          >
+            <LogOut className="h-5 w-5 text-zinc-400" />
+            <span className="flex-1 text-left text-base">
+              {isSigningOut ? "로그아웃 중..." : "로그아웃"}
+            </span>
+            <ChevronRight className="h-5 w-5 text-zinc-500" />
+          </button>
+        </div>
 
         {/* Divider */}
         <div className="mx-6 border-t border-white/10" />

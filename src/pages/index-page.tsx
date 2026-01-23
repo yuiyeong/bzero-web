@@ -16,6 +16,7 @@ export default function IndexPage() {
       >
         🎈 터미널로 이동
       </button>
+
     </div>
   );
 }
