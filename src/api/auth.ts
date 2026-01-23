@@ -45,3 +45,14 @@ export async function signInWithPassword({ email, password }: AuthCredentials): 
 
   return data;
 }
+
+/**
+ * 로그아웃
+ *
+ * Supabase 세션을 종료하고 로컬 스토리지를 정리합니다.
+ * scope: 'local' | 'global' | 'others' (기본값: 'local')
+ */
+export async function signOut(): Promise<void> {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+}
