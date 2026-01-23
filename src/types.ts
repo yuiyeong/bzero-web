@@ -418,3 +418,27 @@ export interface DailyLoginReward {
   claimed: boolean;
   created_at: string;
 }
+
+// ============================================================================
+// Notification (알림) 관련 타입
+// ============================================================================
+
+/** 알림 타입 */
+export type NotificationType =
+  | "CHECKOUT_REMINDER" // 체크아웃 알림
+  | "DM_REQUEST" // 대화 요청
+  | "ANNOUNCEMENT" // 공지사항
+  | "SYSTEM"; // 시스템 메시지
+
+/** 알림 정보 (백엔드 Notification 모델과 동일) */
+export interface Notification {
+  notification_id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+/** 알림 목록 응답 */
+export interface NotificationListResponse extends ListResponse<Notification> { }

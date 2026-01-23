@@ -45,6 +45,11 @@ export const queryKeys = {
     list: (status?: string) => ["dm", "list", status],
     messages: (dmRoomId: string) => ["dm", "messages", dmRoomId],
   },
+  notifications: {
+    all: ["notifications"],
+    list: (offset?: number, limit?: number) => ["notifications", "list", offset, limit],
+    unreadCount: ["notifications", "unreadCount"],
+  },
 } as const;
 
 export const queryClient = new QueryClient({
