@@ -94,9 +94,7 @@ export default function MyPage() {
             className="flex w-full items-center gap-4 rounded-xl bg-zinc-900/50 px-4 py-4 transition-colors hover:bg-zinc-800/50 disabled:opacity-50"
           >
             <LogOut className="h-5 w-5 text-zinc-400" />
-            <span className="flex-1 text-left text-base">
-              {isSigningOut ? "로그아웃 중..." : "로그아웃"}
-            </span>
+            <span className="flex-1 text-left text-base">{isSigningOut ? "로그아웃 중..." : "로그아웃"}</span>
             <ChevronRight className="h-5 w-5 text-zinc-500" />
           </button>
         </div>
